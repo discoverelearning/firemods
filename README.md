@@ -8,17 +8,17 @@ This open source script allows you to inject enhanced features directly into you
 
 ## 🚀 Installation
 
-1. Copy the `mods.js` file into the `lib` folder of your **published** Rise 360 project.
+1. Copy the `firemods.js` file into the `lib` folder of your **published** Rise 360 project.
 2. Open the `index.html` file located in the **root** directory of your project.
 3. Just before the closing `</html>` tag, insert the following line:
 
     ```html
-    <script src="lib/mods.js"></script>
+    <script src="lib/firemods.js"></script>
     ```
 
 4. Save the changes. That’s it!
 
-You can now activate features from the top of the `mods.js` file by changing configuration options from `false` to `true`, and customising values as needed. Comments in the file provide setup instructions for any features that require prior configuration within Rise.
+You can now activate features from the top of the `firemods.js` file by changing configuration options from `false` to `true`, and customising values as needed. Comments in the file provide setup instructions for any features that require prior configuration within Rise.
 
 ---
 
