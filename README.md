@@ -106,7 +106,7 @@ Trigger custom JavaScript by using a Rise Button Block:
 - The script will run when the button is clicked.
 - Optionally display **confetti** as visual feedback.
 
-### 🎉 Confetti Support
+### 🎉 Confetti Display
 
 - Enable celebratory confetti effects when a button is clicked.
 - Customise colours, speed, particle count, and launch position.
@@ -126,12 +126,11 @@ You are welcome to submit issues or pull requests via GitHub if you'd like to co
 
 ## 📜 License
 
-[GPL-3.0 License](https://www.gnu.org/licenses/gpl-3.0.en.html)  
+[GPL-3.0 License](https://www.gnu.org/licenses/gpl-3.0.en.html)
 © Discover eLearning Ltd
 
 ---
 
 ## 👋 Created by
 
-**Discover eLearning Ltd**  
 [Discover eLearning Ltd](https://discoverelearning.com)  
