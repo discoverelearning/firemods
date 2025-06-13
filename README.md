@@ -2,7 +2,7 @@
 
 **Fire Mods** is a lightweight and powerful add-on script created by [Discover eLearning Ltd](https://discoverelearning.com), designed to supercharge your Articulate Rise 360 courses with custom functionality and advanced interaction options.
 
-This open source script allows you to inject enhanced features directly into your Rise projects post-publish—no need for Rise to support them natively.
+This open source script allows you to inject enhanced features directly into your Rise projects post-publish — end users do not require anything extra to be able to see and interact with these add-ons.
 
 ---
 
