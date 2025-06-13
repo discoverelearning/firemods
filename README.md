@@ -45,13 +45,14 @@ Below is a full list of all configurable Fire Mods features:
 
 ### 📝 Reflection Blocks
 
-Create interactive text entry blocks within Rise using the NOTE block type:
+Create interactive text entry blocks within Rise using the NOTE block type. 
+After activating, just write the following text into the block:
 
 ```text
 REFLECTION ID="REFLECT01" TITLE="..." INSTRUCTION="..."
 ```
 
-- Responses are saved to browser local storage.
+- User responses are saved to browser local storage.
 - **Centred alignment** option for layout.
 - Customisable **Save Button Radius** and button text.
 
