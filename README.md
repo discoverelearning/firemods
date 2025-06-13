@@ -34,8 +34,8 @@ Below is a full list of all configurable Fire Mods features:
 
 ### 🖼️ Text on Image Enhancements
 
-- **Modern Glass Effect** with blur and transparency.
-- **Drop Shadow Styling** for enhanced readability.
+- **Add Frosted Glass Effect** to the text box with blur and transparency.
+- **Drop Shadow Styling** for further custom styling.
 - **Staggered Parallax Scroll** animation.
 - **Alternate Text Box Float** (left/right pattern).
 - **Custom Headline Font** for text overlays.
@@ -68,7 +68,7 @@ Display previously saved reflection responses anywhere in your course using a sh
 
 - Apply a **fixed background colour** behind standard Rise content blocks.
 - Optionally overlay **grid lines**, with adjustable colour and spacing.
-- Does not apply to image overlay blocks.
+- Does not affect the behaviour of Text On Image blocks.
 
 ### 📖 Menu Customisations
 
@@ -77,12 +77,12 @@ Display previously saved reflection responses anywhere in your course using a sh
 
 ### 🔘 Button Block Styling
 
-- **Centre align button blocks**: Removes text description and centres buttons within the block.
+- **Centre align button blocks**: Removes text description spacing and centres buttons within the block.
 - Adjustable **button height** for consistency across devices.
 
 ### ➡️ Continue Button Tweaks
 
-- **Rounded continue buttons**: Set your own border radius.
+- **Rounded continue buttons**: Set your own button border radius.
 - **Replace continue buttons with a horizontal line** after they are clicked (good for visual flow).
 
 ### 🔲 Custom Button Triggers
