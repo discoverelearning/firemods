@@ -51,7 +51,7 @@ Create interactive text entry blocks within Rise using the NOTE block type:
 REFLECTION ID="REFLECT01" TITLE="..." INSTRUCTION="..."
 ```
 
-- Responses are saved locally.
+- Responses are saved locally to browser locale storage.
 - **Centred alignment** option for layout.
 - Customisable **Save Button Radius** and button text.
 
