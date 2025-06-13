@@ -26,13 +26,10 @@ You can now activate features from the top of the `firemods.js` file by changing
 
 Below is a full list of all configurable Fire Mods features:
 
-### 🔧 Developer Tools
-
-- **Block ID Logging**: Enable developer mode to log the IDs of visible blocks as you scroll.
-
 ### 🧠 Scroll Trigger Actions
 
 - Trigger JavaScript when a specific Rise block scrolls into view.
+- Enable developer mode within the script to discover the IDs of visible blocks as you scroll.
 - Choose to fire once or every time the block becomes visible.
 
 ### 🖼️ Text on Image Enhancements
