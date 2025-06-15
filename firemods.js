@@ -102,7 +102,8 @@ const modsConfig = {
         spread: 90,
         startVelocity: 45,
         colours: ['#FFC700', '#FF0000', '#2E3191', '#41BBC7'],
-        origin: 'center' 
+        origin: 'center',
+		zIndex: 9999
     }
 };
 // =================================================================
@@ -204,7 +205,7 @@ function loadConfettiScript() {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js';
-        script.onload = () => { confettiScriptLoaded = true; console.log('Rise mods.js: Confetti script loaded.'); resolve(); };
+        script.onload = () => { confettiScriptLoaded = true; resolve(); };
         script.onerror = reject;
         document.head.appendChild(script);
     });
@@ -212,12 +213,9 @@ function loadConfettiScript() {
 
 function fireConfetti() {
     if (!confettiScriptLoaded) return;
-    const { particleCount, spread, startVelocity, colours, origin } = modsConfig.confettiSettings;
+    const { particleCount, spread, startVelocity, colours, origin, zIndex } = modsConfig.confettiSettings;
     let originPoint = { y: 0.7, x: (origin === 'left' ? 0 : origin === 'right' ? 1 : 0.5) };
-    const confettiExecutor = typeof tsParticles !== 'undefined' ? tsParticles.confetti : window.confetti;
-    if (confettiExecutor) {
-        confettiExecutor({ particleCount, spread, startVelocity, colors: colours, origin: originPoint });
-    }
+    confetti({ particleCount, spread, startVelocity, colors: colours, origin: originPoint, zIndex: zIndex });
 }
 
 function escapeHtml(unsafe) {
@@ -440,7 +438,6 @@ if (modsConfig.developerMode_LogBlockIds || (modsConfig.scrollTriggers && modsCo
 
 let finalCustomCSS = '';
 
-// --- CORRECTED Background CSS Logic ---
 if (modsConfig.enableCustomBackground) {
     let bgLayers = [];
     let bgSizes = [];
@@ -507,8 +504,6 @@ if (modsConfig.enableCustomBackground) {
         #page-wrap { ${pageWrapCSS} }
         .page__wrapper--white, .page__header, .blocks-lesson, .lesson-nav--full { background: transparent !important; }`;
 }
-// --- END CORRECTED SECTION ---
-
 
 if (modsConfig.centreAlignButtons) {
     finalCustomCSS += `
