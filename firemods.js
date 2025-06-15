@@ -307,14 +307,25 @@ function runAllMods() {
     }
 
     if (modsConfig.customButtons && modsConfig.customButtons.length > 0) {
+        if (modsConfig.customButtons.some(button => button.confetti === true)) {
+            loadConfettiScript();
+        }
+
         modsConfig.customButtons.forEach(buttonConfig => {
             const selector = `a.blocks-button__button[href*="${buttonConfig.id}"]:not([data-button-modded="true"])`;
             document.querySelectorAll(selector).forEach(button => {
-                if (buttonConfig.confetti) loadConfettiScript();
                 button.addEventListener('click', event => {
                     event.preventDefault();
-                    if (buttonConfig.confetti) fireConfetti();
-                    if (buttonConfig.script) try { new Function(buttonConfig.script)(); } catch (e) { console.error(`Error in script for "${buttonConfig.id}":`, e); }
+                    if (buttonConfig.confetti) {
+                        fireConfetti();
+                    }
+                    if (buttonConfig.script) {
+                        try { 
+                            new Function(buttonConfig.script)(); 
+                        } catch (e) { 
+                            console.error(`Error in script for "${buttonConfig.id}":`, e); 
+                        }
+                    }
                 });
                 button.dataset.buttonModded = 'true';
             });
