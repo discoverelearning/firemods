@@ -54,9 +54,9 @@ REFLECTION ID="REFLECT01" TITLE="..." INSTRUCTION="..."
 - **Centred alignment** option for layout.
 - Customisable **Save Button Radius** and button text.
 
-### 📋 Summary Shortcodes
+### 📋 Reflection Block Entry Shortcodes
 
-Display previously saved reflection responses anywhere in your course using a shortcode:
+Display learners' previously saved reflection responses anywhere in your course using a shortcode:
 
 ```text
 [REFLECT01]
