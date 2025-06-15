@@ -118,7 +118,7 @@ Trigger custom JavaScript by using a Rise Button Block:
 
 This script is open source and licensed under the **GPL-3.0** license.
 
-If a feature doesn’t quite suit your project, or you have something completely new in mind, feel free to throw the script into a large language model (LLM) and tailor it to your own needs!
+If a feature doesn’t quite suit your project, or you have something completely new in mind, feel free to tailor the script to your own needs!
 
 You are welcome to submit issues or pull requests via GitHub if you'd like to contribute improvements or ideas.
 
