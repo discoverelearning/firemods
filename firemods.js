@@ -7,7 +7,7 @@ const modsConfig = {
     developerMode_LogBlockIds: false,
 
     // --- Custom Scroll Trigger Actions ---
-    // Executes a script when a specific block scrolls into view
+	// Executes a script when a specific block scrolls into view
     scrollTriggers: [
         //{
         //    id: 'cmbqlx72l000u357cces8vtkm', // Example ID - Use Developer Mode above to discover via console
@@ -53,7 +53,13 @@ const modsConfig = {
 	backgroundColour: '#fdfdfd',
     showGridLines: false,
     gridLineColour: 'rgba(0, 0, 0, 0.04)',
-    gridSize: 25,
+    gridSize: 30,
+
+    // --- Add Custom Background Image ---
+	//Image appears over the custom colour set above. Grid lines if activate will appear over the image
+    enableCustomBackgroundImage: false, // Set to 'true' to use an image for the background. Ensure enableCustomBackground is also true
+    backgroundImageUrl: 'https://images.unsplash.com/photo-1749371930388-50c782b0acea?fm=jpg&q=60&w=3000',
+    backgroundImageOpacity: 0.1,
 
     // --- Menu Visibility On Start Customisation ---
     startWithMenuHidden: false, //Change true To Activate
@@ -104,6 +110,86 @@ const modsConfig = {
 // --- SCRIPT LOGIC ---
 // (No need to edit below this line)
 
+// A library to map CSS selectors to human-readable block names.
+const blockTypeMappings = [
+    // Unique & Interactive Blocks (High Priority)
+    { selector: '.block-statement--note', name: 'Note Block' },
+    { selector: '.block-quote--carousel', name: 'Quote Carousel Block' },
+    { selector: '.block-quote--background', name: 'Quote on Image Block' },
+    { selector: '.block-quote--a', name: 'Quote A Block' },
+    { selector: '.block-quote--b', name: 'Quote B Block' },
+    { selector: '.block-quote--c', name: 'Quote C Block' },
+    { selector: '.block-quote--d', name: 'Quote D Block' },
+    { selector: '.block-text--onecol-custom-width-table-med', name: 'Table Block' },
+    { selector: '.block-list--checkboxes', name: 'Checkbox List Block' },
+    { selector: '.block-list--numbered', name: 'Numbered List Block' },
+    { selector: '.block-list--bulleted', name: 'Bulleted List Block' },
+    { selector: '.block-gallery-carousel', name: 'Image Carousel Block' },
+    { selector: '.block-gallery--twocol', name: 'Two Column Image Grid' },
+    { selector: '.block-gallery--threecol', name: 'Three Column Image Grid' },
+    { selector: '.block-gallery--fourcol', name: 'Four Column Image Grid' },
+    { selector: '.block-image--text-aside', name: 'Image & Text Block' },
+    { selector: '.block-image--full', name: 'Full Width Image Block' },
+    { selector: '.block-image--hero', name: 'Image Centred Block' },
+    { selector: '.block-image--overlay', name: 'Text on Image Block' },
+    { selector: '.block-audio', name: 'Audio Block' },
+    { selector: '.block-video', name: 'Video Block' },
+    { selector: '.block-embed', name: 'Embed Block' },
+    { selector: '.block-attachment', name: 'Attachment Block' },
+    { selector: '.block-text--code', name: 'Code Snippet Block' },
+    { selector: '.blocks-accordion', name: 'Accordion Block' },
+    { selector: '.blocks-tabs', name: 'Tabs Block' },
+    { selector: '.block-flashcards.block-flashcard--column', name: 'Flashcard Grid Block' },
+    { selector: '.block-flashcards.block-flashcard--stack', name: 'Flashcard Stack Block' },
+    { selector: '.block-labeled-graphic', name: 'Labeled Graphic Block' },
+    { selector: '.block-process', name: 'Process Block' },
+    { selector: '.block-scenario', name: 'Scenario Block' },
+    { selector: '.block-sorting-activity', name: 'Sorting Activity Block' },
+    { selector: '.block-timeline', name: 'Timeline Block' },
+    { selector: '.blocks-storyline', name: 'Storyline Block' },
+    { selector: '.blocks-buttonstack', name: 'Button Stack Block' },
+    { selector: '.block-knowledge__wrapper--multiple.choice', name: 'Multiple Choice Question' },
+    { selector: '.block-knowledge__wrapper--multiple.response', name: 'Multiple Response Question' },
+    { selector: '.block-knowledge__wrapper--fillin', name: 'Fill in the Blank Question' },
+    { selector: '.block-knowledge__wrapper--matching', name: 'Matching Question' },
+    { selector: '.block-chart .block-chart__circle', name: 'Pie Chart Block' }, // Pie charts have a unique inner class
+    { selector: '.block-chart', name: 'Bar or Line Chart Block' }, // Generic chart as a fallback
+    { selector: '.block-divider--numbered', name: 'Numbered Divider Block' },
+    { selector: '.block-divider--spacing', name: 'Spacer Block' },
+    { selector: '.block-divider', name: 'Divider Block' },
+
+    // Standard Text Blocks (Order is important)
+    { selector: '.block-statement--a', name: 'Statement A Block' },
+    { selector: '.block-statement--b', name: 'Statement B Block' },
+    { selector: '.block-statement--c', name: 'Statement C Block' },
+    { selector: '.block-statement--d', name: 'Statement D Block' },
+    { selector: '.block-text--twocol', name: 'Columns Block' },
+    { selector: '.block-text--heading-custom-width:has(h2)', name: 'Heading Block' },
+    { selector: '.block-text--heading-custom-width:has(h3)', name: 'Subheading Block' },
+    { selector: '.block-text--onecol-custom-width:has(h2)', name: 'Paragraph with Heading Block' },
+    { selector: '.block-text--onecol-custom-width:has(h3)', name: 'Paragraph with Subheading Block' },
+    { selector: '.block-text--onecol-custom-width', name: 'Paragraph Block' },
+
+    // General Fallbacks
+    { selector: '.blocks-button', name: 'Button Block' },
+    { selector: '.continue-btn', name: 'Continue Button Block' },
+    { selector: '[data-continue-sr]', name: 'Completed Continue Block' },
+    { selector: '.block-image', name: 'Image Block' },
+    { selector: '.block-gallery', name: 'Gallery Block' },
+    { selector: '.block-quote', name: 'Quote Block' },
+    { selector: '.block-list', name: 'List Block' },
+    { selector: '.block-knowledge', name: 'Knowledge Check Block' },
+];
+
+function getBlockTypeName(element) {
+    for (const mapping of blockTypeMappings) {
+        if (element.querySelector(mapping.selector)) {
+            return mapping.name;
+        }
+    }
+    return 'Block';
+}
+
 let menuToggleButtonClicked = false;
 let confettiScriptLoaded = false;
 let scrollTriggerObserver; 
@@ -112,7 +198,6 @@ let scrollTriggerVisibilityState = new WeakMap();
 let parallaxInitialized = false;
 let latestKnownScrollY = 0;
 let ticking = false;
-
 
 function loadConfettiScript() {
     if (confettiScriptLoaded) return Promise.resolve();
@@ -129,7 +214,10 @@ function fireConfetti() {
     if (!confettiScriptLoaded) return;
     const { particleCount, spread, startVelocity, colours, origin } = modsConfig.confettiSettings;
     let originPoint = { y: 0.7, x: (origin === 'left' ? 0 : origin === 'right' ? 1 : 0.5) };
-    confetti({ particleCount, spread, startVelocity, colors: colours, origin: originPoint });
+    const confettiExecutor = typeof tsParticles !== 'undefined' ? tsParticles.confetti : window.confetti;
+    if (confettiExecutor) {
+        confettiExecutor({ particleCount, spread, startVelocity, colors: colours, origin: originPoint });
+    }
 }
 
 function escapeHtml(unsafe) {
@@ -141,6 +229,7 @@ function escapeHtml(unsafe) {
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
 }
+
 
 function updateShortcodeDisplay(reflectionId) {
     if (!modsConfig.enableSummaryShortcodes) return;
@@ -170,36 +259,25 @@ function runShortcodeReplacement() {
     });
 }
 
-// Staggered Parallax logic
 function initializeParallax() {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const parallaxElements = document.querySelectorAll('.block-image--overlay .block-image__paragraph');
     const pageWrap = document.getElementById('page-wrap');
-
-    if (parallaxInitialized || parallaxElements.length === 0 || !pageWrap) {
-        return;
-    }
-
+    if (parallaxInitialized || parallaxElements.length === 0 || !pageWrap) return;
     if (isMobile) {
         parallaxElements.forEach(el => { el.style.transform = 'none'; });
         parallaxInitialized = true;
         return;
     }
-    
     parallaxElements.forEach((el, index) => {
         const initialOffset = 220 * index;
         el.dataset.initialOffset = initialOffset;
         el.style.transform = `translateY(${initialOffset}px)`;
     });
-
     function onScroll() {
         latestKnownScrollY = pageWrap.scrollTop;
-        if (!ticking) {
-            window.requestAnimationFrame(update);
-            ticking = true;
-        }
+        if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
     }
-
     function update() {
         parallaxElements.forEach(el => {
             const initialOffset = parseFloat(el.dataset.initialOffset) || 0;
@@ -208,13 +286,10 @@ function initializeParallax() {
         });
         ticking = false;
     }
-
     pageWrap.addEventListener('scroll', onScroll, { passive: true });
     parallaxInitialized = true;
 }
 
-
-// The main function that runs on every page change
 function runAllMods() {
     if (modsConfig.enableCustomBackground) {
         document.querySelectorAll('.block-wrapper:not([data-modded="true"])').forEach(block => {
@@ -262,7 +337,7 @@ function runAllMods() {
                 const title = titleMatch ? titleMatch[1] : 'Reflection';
                 const instruction = instructionMatch ? instructionMatch[1] : 'Enter your thoughts below:';
                 const alignmentClass = modsConfig.reflectionBlock_CentreAlign ? 'reflection-block--centred' : '';
-                const reflectionHTML = `<div class="reflection-block ${alignmentClass}"><h3>${title}</h3> <p>${instruction}</p><textarea class="reflection-textarea" placeholder="Type your response here..."></textarea><button class="reflection-save-btn">${modsConfig.reflectionBlock_ButtonText}</button><div class="reflection-saved-feedback">Answer Saved!</div></div>`;
+                const reflectionHTML = `<div class="reflection-block ${alignmentClass}"><h3>${title}</h3><p>${instruction}</p><textarea class="reflection-textarea" placeholder="Type your response here..."></textarea><button class="reflection-save-btn">${modsConfig.reflectionBlock_ButtonText}</button><div class="reflection-saved-feedback">Answer Saved!</div></div>`;
                 const container = noteBlock.querySelector('.block-statement__container');
                 if (container) {
                     container.innerHTML = reflectionHTML;
@@ -307,23 +382,16 @@ function runAllMods() {
         });
     }
     
-    // --- [REPAIRED] Text on Image Floating Logic ---
     if (modsConfig.moderniseTextOnImage && modsConfig.textOnImage_AlternateFloat) {
-        // Find all "Text on Image" blocks on the page.
         const allTextImageBlocks = document.querySelectorAll('.block-image--overlay');
         allTextImageBlocks.forEach((block, index) => {
-            // Check if we have already processed this block to avoid re-applying styles.
             if (block.hasAttribute('data-float-modded')) return;
-
-            // Apply float:right to the text column of every even block.
             if ((index + 1) % 2 === 0) {
                 const textColumn = block.querySelector('.block-image__col');
                 if (textColumn) {
-                    // This is the most direct and powerful way to override CSS.
                     textColumn.style.float = "right";
                 }
             }
-            // Tag the main block so we don't process it again.
             block.dataset.floatModded = 'true';
         });
     }
@@ -335,10 +403,8 @@ function runAllMods() {
     runShortcodeReplacement();
 }
 
-
 // --- Main Execution Block (CSS Injection & Observer Setup) ---
 
-// Initialize IntersectionObserver for dev mode and scroll triggers
 if (modsConfig.developerMode_LogBlockIds || (modsConfig.scrollTriggers && modsConfig.scrollTriggers.length > 0)) {
     const observerOptions = { root: null, threshold: 0.1 };
     scrollTriggerObserver = new IntersectionObserver((entries, observer) => {
@@ -347,7 +413,8 @@ if (modsConfig.developerMode_LogBlockIds || (modsConfig.scrollTriggers && modsCo
             if (modsConfig.developerMode_LogBlockIds) {
                 const isDevLogVisible = blockIdLogState.get(entry.target);
                 if (entry.isIntersecting && !isDevLogVisible) {
-                    console.log(`%cRise mods.js (Dev Mode):%c Block scrolled INTO view with ID: %c${blockId}`, "color: #ff9800; font-weight: bold;", "color: inherit;", "color: #03a9f4; font-weight: bold;");
+                    const blockTypeName = getBlockTypeName(entry.target);
+                    console.log(`%cRise mods.js (Dev Mode):%c ${blockTypeName} scrolled INTO view with ID: %c${blockId}`, "color: #ff9800; font-weight: bold;", "color: inherit;", "color: #03a9f4; font-weight: bold;");
                     blockIdLogState.set(entry.target, true);
                 } else if (!entry.isIntersecting && isDevLogVisible) {
                     blockIdLogState.set(entry.target, false);
@@ -371,17 +438,77 @@ if (modsConfig.developerMode_LogBlockIds || (modsConfig.scrollTriggers && modsCo
     }, observerOptions);
 }
 
-// Build the CSS string
 let finalCustomCSS = '';
 
+// --- CORRECTED Background CSS Logic ---
 if (modsConfig.enableCustomBackground) {
-    let gridImageCSS = modsConfig.showGridLines ? `
-        background-image: linear-gradient(${modsConfig.gridLineColour} 1px, transparent 1px), linear-gradient(90deg, ${modsConfig.gridLineColour} 1px, transparent 1px);
-        background-size: ${modsConfig.gridSize}px ${modsConfig.gridSize}px;` : '';
+    let bgLayers = [];
+    let bgSizes = [];
+    let bgPositions = [];
+    let bgRepeats = [];
+
+    // Layer 3 (Bottom): The background image itself.
+    if (modsConfig.enableCustomBackgroundImage && modsConfig.backgroundImageUrl) {
+        bgLayers.push(`url('${modsConfig.backgroundImageUrl}')`);
+        bgSizes.push('cover');
+        bgPositions.push('center center');
+        bgRepeats.push('no-repeat');
+    }
+
+    // Layer 2: A solid color overlay to control the image's "opacity".
+    // This calculates the opaqueness of the color overlay needed to achieve the desired image opacity.
+    if (modsConfig.enableCustomBackgroundImage && modsConfig.backgroundImageUrl) {
+        const overlayOpacity = 1 - modsConfig.backgroundImageOpacity;
+        const color = modsConfig.backgroundColour;
+        
+        let r=0, g=0, b=0;
+        if (color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)) {
+            let hex = color.substring(1).split('');
+            if (hex.length === 3) { hex = [hex[0], hex[0], hex[1], hex[1], hex[2], hex[2]]; }
+            hex = '0x' + hex.join('');
+            r = (hex>>16)&255; g = (hex>>8)&255; b = hex&255;
+        }
+        bgLayers.push(`linear-gradient(rgba(${r},${g},${b},${overlayOpacity}), rgba(${r},${g},${b},${overlayOpacity}))`);
+        bgSizes.push('auto');
+        bgPositions.push('center center');
+        bgRepeats.push('no-repeat');
+    }
+    
+    // Layer 1 (Top): The grid lines.
+    if (modsConfig.showGridLines) {
+        bgLayers.push(`linear-gradient(${modsConfig.gridLineColour} 1px, transparent 1px)`);
+        bgSizes.push(`${modsConfig.gridSize}px ${modsConfig.gridSize}px`);
+        bgPositions.push('top left');
+        bgRepeats.push('repeat');
+
+        bgLayers.push(`linear-gradient(90deg, ${modsConfig.gridLineColour} 1px, transparent 1px)`);
+        bgSizes.push(`${modsConfig.gridSize}px ${modsConfig.gridSize}px`);
+        bgPositions.push('top left');
+        bgRepeats.push('repeat');
+    }
+    
+    // CSS layers are applied bottom-to-top, but we build the array top-to-bottom. We must reverse it.
+    bgLayers.reverse();
+    bgSizes.reverse();
+    bgPositions.reverse();
+    bgRepeats.reverse();
+
+    let pageWrapCSS = `background-color: ${modsConfig.backgroundColour}; background-attachment: fixed;`;
+    if (bgLayers.length > 0) {
+        pageWrapCSS += `
+            background-image: ${bgLayers.join(', ')};
+            background-size: ${bgSizes.join(', ')};
+            background-position: ${bgPositions.join(', ')};
+            background-repeat: ${bgRepeats.join(', ')};
+        `;
+    }
+
     finalCustomCSS += `
-        #page-wrap { background-color: ${modsConfig.backgroundColour}; ${gridImageCSS} background-attachment: fixed; }
+        #page-wrap { ${pageWrapCSS} }
         .page__wrapper--white, .page__header, .blocks-lesson, .lesson-nav--full { background: transparent !important; }`;
 }
+// --- END CORRECTED SECTION ---
+
 
 if (modsConfig.centreAlignButtons) {
     finalCustomCSS += `
@@ -473,7 +600,6 @@ if (modsConfig.moderniseTextOnImage) {
     }
 }
 
-// Inject all CSS into the page
 if (finalCustomCSS) {
     const styleSheet = document.createElement("style");
     styleSheet.type = "text/css";
@@ -486,4 +612,4 @@ const config = { childList: true, subtree: true };
 const observer = new MutationObserver(runAllMods);
 observer.observe(targetNode, config);
 window.addEventListener('load', runAllMods);
-console.log('Rise mods.js: Script loaded and now observing for all content changes...');
+console.log('Fire Mods by Discover eLearning: Script loaded and now observing for all content changes...');

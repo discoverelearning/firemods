@@ -26,10 +26,11 @@ You can now activate features from the top of the `firemods.js` file by changing
 
 Below is a full list of all configurable Fire Mods features:
 
-### 🧠 Scroll Trigger Actions
+### 📜 Scroll Trigger Actions
 
 - Trigger JavaScript when a specific Rise block scrolls into view.
 - Enable developer mode within the script to discover the IDs of visible blocks as you scroll.
+- **Block ID Logging To Console** displays the Rise block type making it easier to identify the correct ID value for blocks.
 - Choose to fire once or every time the block becomes visible.
 
 ### 🖼️ Text on Image Enhancements
@@ -67,6 +68,7 @@ Display previously saved reflection responses anywhere in your course using a sh
 ### 🖼️ Custom Background Styling
 
 - Apply a **fixed background colour** behind standard Rise content blocks.
+- **Option to enable a custom image file as a custom background style** for enhanced visual appeal.
 - Optionally overlay **grid lines**, with adjustable colour and spacing.
 - Does not affect the behaviour of Text On Image blocks.
 
