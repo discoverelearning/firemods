@@ -11,12 +11,12 @@ const modsConfig = {
     scrollTriggers: [
         //{
         //    id: 'cmbqlx72l000u357cces8vtkm', // Example ID - Use Developer Mode above to discover via console
-        //    script: 'console.log("This message will appear ONLY ONCE for this block.");',
+        //    script: `console.log("This message will appear ONLY ONCE for this block.");`,
         //    fireOnce: true
         //},
         //{
         //    id: 'cmbrrrgxm00li357dkhllr3sw', // Example ID - Use Developer Mode above to discover via console
-        //    script: 'console.log("This message will appear EVERY TIME this block is scrolled into view.");',
+        //    script: `console.log("This message will appear EVERY TIME this block is scrolled into view.");`,
         //    fireOnce: false
         //}
     ],
@@ -103,7 +103,7 @@ const modsConfig = {
     customButtons: [
         //{
         //    id: 'MYSCRIPT01',
-        //    script: 'console.log("Add your custom script between the open and close single quotes on this line");',
+        //    script: `console.log("Add your custom script between the open and close single quotes on this line");`,
         //    confetti: false //Change to true to display confetti when button is clicked (good for testing!)
         //}
     ],
