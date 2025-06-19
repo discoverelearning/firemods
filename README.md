@@ -40,6 +40,7 @@ Below is a full list of all configurable Fire Mods features:
 - **Staggered Parallax Scroll** animation.
 - **Alternate Text Box Float** (left/right pattern).
 - **Custom Headline Font** for text overlays.
+- **Control Text Block Width** to adjust the responsive width of text overlays on images.
 
 ### 📝 Reflection Blocks
 
@@ -71,6 +72,16 @@ Display learners' previously saved reflection responses anywhere in your course 
 - **Option to enable a custom image file as a custom background style** for enhanced visual appeal.
 - Optionally overlay **grid lines**, with adjustable colour and spacing.
 - Does not affect the behaviour of Text On Image blocks.
+
+### 🏠 Course Homepage Customisation Options
+
+- **Override Cover Page Padding**: Customize the padding around cover page content for better spacing control and visual alignment.
+
+### 🔊 Text-to-Speech Feature
+
+- **Interactive Text Reader**: Add a floating speech bubble button that enables learners to click on any content block to have it read aloud.
+- Fully customisable button styling including colours, size, and positioning.
+- Automatically uses the browser's built-in speech synthesis for accessibility.
 
 ### 📖 Menu Customisations
 
