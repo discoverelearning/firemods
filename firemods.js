@@ -20,9 +20,21 @@ const modsConfig = {
         //    fireOnce: false
         //}
     ],
+    
+    // --- Cover Page Customisations ---
+    overrideCoverPagePadding: false,
+    coverPagePadding: '4rem 7rem',
+
+    // --- Text-to-Speech Customisation ---
+    enableTextReader: false,
+    textReader_ButtonColour: '#0070a3',
+    textReader_ButtonColourInactive: '#636363',
+    textReader_ButtonSize: '50px',
 
     // --- Text on Image Block Customisations ---
-    moderniseTextOnImage: false, //Change true To Activate
+    moderniseTextOnImage: false,
+    textOnImage_TextBlockWidth: '90%',
+    textOnImage_Padding: '4rem 7rem',
     textOnImage_GlassEffect: false,
 	textOnImage_GlassBlur: '6px', 
 	textOnImage_GlassBackground: 'rgba(255, 255, 255, 0.2)',
@@ -36,7 +48,7 @@ const modsConfig = {
 	//Steps To Follow in Rise: Create a NOTE block and paste the following content:
 	//REFLECTION ID="REFLECT01" TITLE="What do you think the process of establishing a counselling skills relationship involves?" INSTRUCTION="Write your answer in the box below:"
 	//Customise the ID Value, question TITLE, and INSTRUCTION text given to the user in the Rise block
-    enableReflectionBlocks: false, //Change true To Activate
+    enableReflectionBlocks: false,
     reflectionBlock_CentreAlign: false,
     reflectionBlock_ButtonRadius: '50px',
     reflectionBlock_ButtonText: 'Save My Answer',
@@ -45,16 +57,16 @@ const modsConfig = {
 	//Steps To Follow in Rise: Add the following text into ANY Rise block:
 	//[REFLECT01]
 	//Replace the value in the square brackets with the ID of the Reflection Block
-    enableSummaryShortcodes: false, //Change true To Activate
+    enableSummaryShortcodes: false,
     summaryShortcode_DefaultText: 'You may not have yet provided an answer to this reflection activity. You can go back and complete this now if you wish.',
 
     // --- Rise Background Customisations (Apply fixed background behind all standard Rise content blocks, this does not apply for example to TEXT ON IMAGE blocks) ---
-    enableCustomBackground: false, //Change true To Activate
+    enableCustomBackground: false,
 	backgroundColour: '#fdfdfd',
     showGridLines: false,
     gridLineColour: 'rgba(0, 0, 0, 0.04)',
     gridSize: 30,
-
+	
     // --- Add Custom Background Image ---
 	//Image appears over the custom colour set above. Grid lines if activate will appear over the image
     enableCustomBackgroundImage: false, // Set to 'true' to use an image for the background. Ensure enableCustomBackground is also true
@@ -62,10 +74,10 @@ const modsConfig = {
     backgroundImageOpacity: 0.1,
 
     // --- Menu Visibility On Start Customisation ---
-    startWithMenuHidden: false, //Change true To Activate
+    startWithMenuHidden: false,
 
     // --- Menu Button Customisation ---
-    moderniseMenuButton: false, //Change true To Activate
+    moderniseMenuButton: false,
     modernMenuButton_Blur: '1px',
     modernMenuButton_Opacity: 0.1,
     modernMenuButton_Shadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
@@ -76,7 +88,7 @@ const modsConfig = {
     centredButtonHeight: '5rem', //Change to add extra height to the button if required
 
     // --- Continue Button Block Customisations---
-	roundContinueButtons: false, //Change true To Activate
+	roundContinueButtons: false,
     continueButton_BorderRadius: '50px',
 	
     replaceContinueWithLine: false, //Change true To Add Line Separator Once Continue Button Is Clicked
@@ -111,83 +123,12 @@ const modsConfig = {
 // --- SCRIPT LOGIC ---
 // (No need to edit below this line)
 
-// A library to map CSS selectors to human-readable block names.
 const blockTypeMappings = [
-    // Unique & Interactive Blocks (High Priority)
-    { selector: '.block-statement--note', name: 'Note Block' },
-    { selector: '.block-quote--carousel', name: 'Quote Carousel Block' },
-    { selector: '.block-quote--background', name: 'Quote on Image Block' },
-    { selector: '.block-quote--a', name: 'Quote A Block' },
-    { selector: '.block-quote--b', name: 'Quote B Block' },
-    { selector: '.block-quote--c', name: 'Quote C Block' },
-    { selector: '.block-quote--d', name: 'Quote D Block' },
-    { selector: '.block-text--onecol-custom-width-table-med', name: 'Table Block' },
-    { selector: '.block-list--checkboxes', name: 'Checkbox List Block' },
-    { selector: '.block-list--numbered', name: 'Numbered List Block' },
-    { selector: '.block-list--bulleted', name: 'Bulleted List Block' },
-    { selector: '.block-gallery-carousel', name: 'Image Carousel Block' },
-    { selector: '.block-gallery--twocol', name: 'Two Column Image Grid' },
-    { selector: '.block-gallery--threecol', name: 'Three Column Image Grid' },
-    { selector: '.block-gallery--fourcol', name: 'Four Column Image Grid' },
-    { selector: '.block-image--text-aside', name: 'Image & Text Block' },
-    { selector: '.block-image--full', name: 'Full Width Image Block' },
-    { selector: '.block-image--hero', name: 'Image Centred Block' },
-    { selector: '.block-image--overlay', name: 'Text on Image Block' },
-    { selector: '.block-audio', name: 'Audio Block' },
-    { selector: '.block-video', name: 'Video Block' },
-    { selector: '.block-embed', name: 'Embed Block' },
-    { selector: '.block-attachment', name: 'Attachment Block' },
-    { selector: '.block-text--code', name: 'Code Snippet Block' },
-    { selector: '.blocks-accordion', name: 'Accordion Block' },
-    { selector: '.blocks-tabs', name: 'Tabs Block' },
-    { selector: '.block-flashcards.block-flashcard--column', name: 'Flashcard Grid Block' },
-    { selector: '.block-flashcards.block-flashcard--stack', name: 'Flashcard Stack Block' },
-    { selector: '.block-labeled-graphic', name: 'Labeled Graphic Block' },
-    { selector: '.block-process', name: 'Process Block' },
-    { selector: '.block-scenario', name: 'Scenario Block' },
-    { selector: '.block-sorting-activity', name: 'Sorting Activity Block' },
-    { selector: '.block-timeline', name: 'Timeline Block' },
-    { selector: '.blocks-storyline', name: 'Storyline Block' },
-    { selector: '.blocks-buttonstack', name: 'Button Stack Block' },
-    { selector: '.block-knowledge__wrapper--multiple.choice', name: 'Multiple Choice Question' },
-    { selector: '.block-knowledge__wrapper--multiple.response', name: 'Multiple Response Question' },
-    { selector: '.block-knowledge__wrapper--fillin', name: 'Fill in the Blank Question' },
-    { selector: '.block-knowledge__wrapper--matching', name: 'Matching Question' },
-    { selector: '.block-chart .block-chart__circle', name: 'Pie Chart Block' }, // Pie charts have a unique inner class
-    { selector: '.block-chart', name: 'Bar or Line Chart Block' }, // Generic chart as a fallback
-    { selector: '.block-divider--numbered', name: 'Numbered Divider Block' },
-    { selector: '.block-divider--spacing', name: 'Spacer Block' },
-    { selector: '.block-divider', name: 'Divider Block' },
-
-    // Standard Text Blocks (Order is important)
-    { selector: '.block-statement--a', name: 'Statement A Block' },
-    { selector: '.block-statement--b', name: 'Statement B Block' },
-    { selector: '.block-statement--c', name: 'Statement C Block' },
-    { selector: '.block-statement--d', name: 'Statement D Block' },
-    { selector: '.block-text--twocol', name: 'Columns Block' },
-    { selector: '.block-text--heading-custom-width:has(h2)', name: 'Heading Block' },
-    { selector: '.block-text--heading-custom-width:has(h3)', name: 'Subheading Block' },
-    { selector: '.block-text--onecol-custom-width:has(h2)', name: 'Paragraph with Heading Block' },
-    { selector: '.block-text--onecol-custom-width:has(h3)', name: 'Paragraph with Subheading Block' },
-    { selector: '.block-text--onecol-custom-width', name: 'Paragraph Block' },
-
-    // General Fallbacks
-    { selector: '.blocks-button', name: 'Button Block' },
-    { selector: '.continue-btn', name: 'Continue Button Block' },
-    { selector: '[data-continue-sr]', name: 'Completed Continue Block' },
-    { selector: '.block-image', name: 'Image Block' },
-    { selector: '.block-gallery', name: 'Gallery Block' },
-    { selector: '.block-quote', name: 'Quote Block' },
-    { selector: '.block-list', name: 'List Block' },
-    { selector: '.block-knowledge', name: 'Knowledge Check Block' },
+    { selector: '.block-statement--note', name: 'Note Block' }, { selector: '.block-quote--carousel', name: 'Quote Carousel Block' }, { selector: '.block-quote--background', name: 'Quote on Image Block' }, { selector: '.block-quote--a', name: 'Quote A Block' }, { selector: '.block-quote--b', name: 'Quote B Block' }, { selector: '.block-quote--c', name: 'Quote C Block' }, { selector: '.block-quote--d', name: 'Quote D Block' }, { selector: '.block-text--onecol-custom-width-table-med', name: 'Table Block' }, { selector: '.block-list--checkboxes', name: 'Checkbox List Block' }, { selector: '.block-list--numbered', name: 'Numbered List Block' }, { selector: '.block-list--bulleted', name: 'Bulleted List Block' }, { selector: '.block-gallery-carousel', name: 'Image Carousel Block' }, { selector: '.block-gallery--twocol', name: 'Two Column Image Grid' }, { selector: '.block-gallery--threecol', name: 'Three Column Image Grid' }, { selector: '.block-gallery--fourcol', name: 'Four Column Image Grid' }, { selector: '.block-image--text-aside', name: 'Image & Text Block' }, { selector: '.block-image--full', name: 'Full Width Image Block' }, { selector: '.block-image--hero', name: 'Image Centred Block' }, { selector: '.block-image--overlay', name: 'Text on Image Block' }, { selector: '.block-audio', name: 'Audio Block' }, { selector: '.block-video', name: 'Video Block' }, { selector: '.block-embed', name: 'Embed Block' }, { selector: '.block-attachment', name: 'Attachment Block' }, { selector: '.block-text--code', name: 'Code Snippet Block' }, { selector: '.blocks-accordion', name: 'Accordion Block' }, { selector: '.blocks-tabs', name: 'Tabs Block' }, { selector: '.block-flashcards.block-flashcard--column', name: 'Flashcard Grid Block' }, { selector: '.block-flashcards.block-flashcard--stack', name: 'Flashcard Stack Block' }, { selector: '.block-labeled-graphic', name: 'Labeled Graphic Block' }, { selector: '.block-process', name: 'Process Block' }, { selector: '.block-scenario', name: 'Scenario Block' }, { selector: '.block-sorting-activity', name: 'Sorting Activity Block' }, { selector: '.block-timeline', name: 'Timeline Block' }, { selector: '.blocks-storyline', name: 'Storyline Block' }, { selector: '.blocks-buttonstack', name: 'Button Stack Block' }, { selector: '.block-knowledge__wrapper--multiple.choice', name: 'Multiple Choice Question' }, { selector: '.block-knowledge__wrapper--multiple.response', name: 'Multiple Response Question' }, { selector: '.block-knowledge__wrapper--fillin', name: 'Fill in the Blank Question' }, { selector: '.block-knowledge__wrapper--matching', name: 'Matching Question' }, { selector: '.block-chart .block-chart__circle', name: 'Pie Chart Block' }, { selector: '.block-chart', name: 'Bar or Line Chart Block' }, { selector: '.block-divider--numbered', name: 'Numbered Divider Block' }, { selector: '.block-divider--spacing', name: 'Spacer Block' }, { selector: '.block-divider', name: 'Divider Block' }, { selector: '.block-statement--a', name: 'Statement A Block' }, { selector: '.block-statement--b', name: 'Statement B Block' }, { selector: '.block-statement--c', name: 'Statement C Block' }, { selector: '.block-statement--d', name: 'Statement D Block' }, { selector: '.block-text--twocol', name: 'Columns Block' }, { selector: '.block-text--heading-custom-width:has(h2)', name: 'Heading Block' }, { selector: '.block-text--heading-custom-width:has(h3)', name: 'Subheading Block' }, { selector: '.block-text--onecol-custom-width:has(h2)', name: 'Paragraph with Heading Block' }, { selector: '.block-text--onecol-custom-width:has(h3)', name: 'Paragraph with Subheading Block' }, { selector: '.block-text--onecol-custom-width', name: 'Paragraph Block' }, { selector: '.blocks-button', name: 'Button Block' }, { selector: '.continue-btn', name: 'Continue Button Block' }, { selector: '[data-continue-sr]', name: 'Completed Continue Block' }, { selector: '.block-image', name: 'Image Block' }, { selector: '.block-gallery', name: 'Gallery Block' }, { selector: '.block-quote', name: 'Quote Block' }, { selector: '.block-list', name: 'List Block' }, { selector: '.block-knowledge', name: 'Knowledge Check Block' },
 ];
 
 function getBlockTypeName(element) {
-    for (const mapping of blockTypeMappings) {
-        if (element.querySelector(mapping.selector)) {
-            return mapping.name;
-        }
-    }
+    for (const mapping of blockTypeMappings) { if (element.querySelector(mapping.selector)) { return mapping.name; } }
     return 'Block';
 }
 
@@ -199,6 +140,8 @@ let scrollTriggerVisibilityState = new WeakMap();
 let parallaxInitialized = false;
 let latestKnownScrollY = 0;
 let ticking = false;
+let ttsInitialized = false;
+let ttsActive = false;
 
 function loadConfettiScript() {
     if (confettiScriptLoaded) return Promise.resolve();
@@ -215,7 +158,10 @@ function fireConfetti() {
     if (!confettiScriptLoaded) return;
     const { particleCount, spread, startVelocity, colours, origin, zIndex } = modsConfig.confettiSettings;
     let originPoint = { y: 0.7, x: (origin === 'left' ? 0 : origin === 'right' ? 1 : 0.5) };
-    confetti({ particleCount, spread, startVelocity, colors: colours, origin: originPoint, zIndex: zIndex });
+    const confettiExecutor = typeof tsParticles !== 'undefined' ? tsParticles.confetti : window.confetti;
+    if (confettiExecutor) {
+        confettiExecutor({ particleCount, spread, startVelocity, colors: colours, origin: originPoint, zIndex: zIndex });
+    }
 }
 
 function escapeHtml(unsafe) {
@@ -228,16 +174,13 @@ function escapeHtml(unsafe) {
          .replace(/'/g, "&#039;");
 }
 
-
 function updateShortcodeDisplay(reflectionId) {
     if (!modsConfig.enableSummaryShortcodes) return;
     const storageKey = `reflection-${reflectionId}`;
     const savedData = localStorage.getItem(storageKey);
     const replacementText = savedData ? escapeHtml(atob(savedData)) : modsConfig.summaryShortcode_DefaultText;
     const targetSpans = document.querySelectorAll(`.summary-shortcode-text[data-shortcode-id="${reflectionId}"]`);
-    targetSpans.forEach(span => {
-        span.innerHTML = replacementText.replace(/\n/g, '<br>');
-    });
+    targetSpans.forEach(span => { span.innerHTML = replacementText.replace(/\n/g, '<br>'); });
 }
 
 function runShortcodeReplacement() {
@@ -258,26 +201,32 @@ function runShortcodeReplacement() {
 }
 
 function initializeParallax() {
+    if (!modsConfig.moderniseTextOnImage || !modsConfig.textOnImage_StaggeredParallax) return;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const parallaxElements = document.querySelectorAll('.block-image--overlay .block-image__paragraph');
     const pageWrap = document.getElementById('page-wrap');
-    if (parallaxInitialized || parallaxElements.length === 0 || !pageWrap) return;
+    if (parallaxElements.length === 0 || !pageWrap) return;
     if (isMobile) {
         parallaxElements.forEach(el => { el.style.transform = 'none'; });
-        parallaxInitialized = true;
         return;
     }
+    if (!window.parallaxInitializedElements) {
+        window.parallaxInitializedElements = new WeakMap();
+    }
     parallaxElements.forEach((el, index) => {
+        if (window.parallaxInitializedElements.has(el)) return;
         const initialOffset = 220 * index;
         el.dataset.initialOffset = initialOffset;
         el.style.transform = `translateY(${initialOffset}px)`;
+        window.parallaxInitializedElements.set(el, true);
     });
+    if (parallaxInitialized) return; 
     function onScroll() {
         latestKnownScrollY = pageWrap.scrollTop;
         if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
     }
     function update() {
-        parallaxElements.forEach(el => {
+        document.querySelectorAll('.block-image--overlay .block-image__paragraph').forEach(el => {
             const initialOffset = parseFloat(el.dataset.initialOffset) || 0;
             const newTranslate = initialOffset - (latestKnownScrollY * 0.2);
             el.style.transform = `translateY(${newTranslate}px)`;
@@ -286,6 +235,58 @@ function initializeParallax() {
     }
     pageWrap.addEventListener('scroll', onScroll, { passive: true });
     parallaxInitialized = true;
+}
+
+function initializeTextReader() {
+    if (!modsConfig.enableTextReader || ttsInitialized) return;
+    const synth = window.speechSynthesis;
+    if (!synth) {
+        console.warn("Rise mods.js: Text-to-Speech not supported by this browser.");
+        return;
+    }
+
+    const ttsButton = document.createElement('button');
+    ttsButton.className = 'tts-toggle-button';
+    ttsButton.setAttribute('aria-label', 'Activate text reader');
+    ttsButton.setAttribute('title', 'Activate text reader');
+    
+    // [MODIFIED] Use the new speech bubble SVG
+    ttsButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="${modsConfig.textReader_ButtonColourInactive}"><path d="M115.008,486.216v-103.76H0V25.784h512v356.672H242.752L115.008,486.216z M32,350.456h115.008V419l84.352-68.544H480V57.784H32V350.456z"/></svg>`;
+    document.body.appendChild(ttsButton);
+
+    const toggleTTS = () => {
+        ttsActive = !ttsActive;
+        document.body.classList.toggle('tts-active-mode', ttsActive);
+        ttsButton.classList.toggle('active', ttsActive);
+        if (!ttsActive && synth.speaking) {
+            synth.cancel();
+        }
+    };
+    
+    ttsButton.addEventListener('click', toggleTTS);
+
+    document.addEventListener('click', (event) => {
+        if (!ttsActive) return;
+        const targetBlock = event.target.closest('.block-wrapper');
+        if (targetBlock) {
+            event.stopPropagation();
+            event.preventDefault();
+            synth.cancel();
+            
+            const textSelector = '.fr-view p, .fr-view li, .fr-view h1, .fr-view h2, .fr-view h3, .fr-view h4, .fr-view h5, .fr-view h6, .block-quote__text, .timeline-card__title, .timeline-card__date, .continue-btn';
+            const textElements = targetBlock.querySelectorAll(textSelector);
+            
+            if (textElements.length > 0) {
+                const textToSpeak = Array.from(textElements).map(el => el.textContent.trim()).filter(Boolean).join('. ');
+                 if (textToSpeak) {
+                    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                    synth.speak(utterance);
+                }
+            }
+        }
+    }, true);
+
+    ttsInitialized = true;
 }
 
 function runAllMods() {
@@ -310,7 +311,6 @@ function runAllMods() {
         if (modsConfig.customButtons.some(button => button.confetti === true)) {
             loadConfettiScript();
         }
-
         modsConfig.customButtons.forEach(buttonConfig => {
             const selector = `a.blocks-button__button[href*="${buttonConfig.id}"]:not([data-button-modded="true"])`;
             document.querySelectorAll(selector).forEach(button => {
@@ -405,10 +405,8 @@ function runAllMods() {
         });
     }
     
-    if (modsConfig.moderniseTextOnImage && modsConfig.textOnImage_StaggeredParallax) {
-        initializeParallax();
-    }
-    
+    initializeParallax();
+    initializeTextReader();
     runShortcodeReplacement();
 }
 
@@ -450,25 +448,12 @@ if (modsConfig.developerMode_LogBlockIds || (modsConfig.scrollTriggers && modsCo
 let finalCustomCSS = '';
 
 if (modsConfig.enableCustomBackground) {
-    let bgLayers = [];
-    let bgSizes = [];
-    let bgPositions = [];
-    let bgRepeats = [];
-
-    // Layer 3 (Bottom): The background image itself.
+    let bgLayers = []; let bgSizes = []; let bgPositions = []; let bgRepeats = [];
     if (modsConfig.enableCustomBackgroundImage && modsConfig.backgroundImageUrl) {
         bgLayers.push(`url('${modsConfig.backgroundImageUrl}')`);
-        bgSizes.push('cover');
-        bgPositions.push('center center');
-        bgRepeats.push('no-repeat');
-    }
-
-    // Layer 2: A solid color overlay to control the image's "opacity".
-    // This calculates the opaqueness of the color overlay needed to achieve the desired image opacity.
-    if (modsConfig.enableCustomBackgroundImage && modsConfig.backgroundImageUrl) {
+        bgSizes.push('cover'); bgPositions.push('center center'); bgRepeats.push('no-repeat');
         const overlayOpacity = 1 - modsConfig.backgroundImageOpacity;
         const color = modsConfig.backgroundColour;
-        
         let r=0, g=0, b=0;
         if (color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)) {
             let hex = color.substring(1).split('');
@@ -477,43 +462,22 @@ if (modsConfig.enableCustomBackground) {
             r = (hex>>16)&255; g = (hex>>8)&255; b = hex&255;
         }
         bgLayers.push(`linear-gradient(rgba(${r},${g},${b},${overlayOpacity}), rgba(${r},${g},${b},${overlayOpacity}))`);
-        bgSizes.push('auto');
-        bgPositions.push('center center');
-        bgRepeats.push('no-repeat');
+        bgSizes.push('auto'); bgPositions.push('center center'); bgRepeats.push('no-repeat');
     }
-    
-    // Layer 1 (Top): The grid lines.
     if (modsConfig.showGridLines) {
         bgLayers.push(`linear-gradient(${modsConfig.gridLineColour} 1px, transparent 1px)`);
         bgSizes.push(`${modsConfig.gridSize}px ${modsConfig.gridSize}px`);
-        bgPositions.push('top left');
-        bgRepeats.push('repeat');
-
+        bgPositions.push('top left'); bgRepeats.push('repeat');
         bgLayers.push(`linear-gradient(90deg, ${modsConfig.gridLineColour} 1px, transparent 1px)`);
         bgSizes.push(`${modsConfig.gridSize}px ${modsConfig.gridSize}px`);
-        bgPositions.push('top left');
-        bgRepeats.push('repeat');
+        bgPositions.push('top left'); bgRepeats.push('repeat');
     }
-    
-    // CSS layers are applied bottom-to-top, but we build the array top-to-bottom. We must reverse it.
-    bgLayers.reverse();
-    bgSizes.reverse();
-    bgPositions.reverse();
-    bgRepeats.reverse();
-
+    bgLayers.reverse(); bgSizes.reverse(); bgPositions.reverse(); bgRepeats.reverse();
     let pageWrapCSS = `background-color: ${modsConfig.backgroundColour}; background-attachment: fixed;`;
     if (bgLayers.length > 0) {
-        pageWrapCSS += `
-            background-image: ${bgLayers.join(', ')};
-            background-size: ${bgSizes.join(', ')};
-            background-position: ${bgPositions.join(', ')};
-            background-repeat: ${bgRepeats.join(', ')};
-        `;
+        pageWrapCSS += `background-image: ${bgLayers.join(', ')}; background-size: ${bgSizes.join(', ')}; background-position: ${bgPositions.join(', ')}; background-repeat: ${bgRepeats.join(', ')};`;
     }
-
-    finalCustomCSS += `
-        #page-wrap { ${pageWrapCSS} }
-        .page__wrapper--white, .page__header, .blocks-lesson, .lesson-nav--full { background: transparent !important; }`;
+    finalCustomCSS += `#page-wrap { ${pageWrapCSS} } .page__wrapper--white, .page__header, .blocks-lesson, .lesson-nav--full { background: transparent !important; }`;
 }
 
 if (modsConfig.centreAlignButtons) {
@@ -592,8 +556,13 @@ if (modsConfig.moderniseTextOnImage) {
         .block-image--overlay .block-image__paragraph {
             ${glassEffectCSS}
             ${dropShadowCSS}
-            padding: 2rem !important;
+            padding: ${modsConfig.textOnImage_Padding} !important;
             border-radius: 8px;
+        }
+        @media(min-width: 48em) {
+            .block-image--overlay .block-image__col {
+                width: ${modsConfig.textOnImage_TextBlockWidth} !important;
+            }
         }
         .block-image--overlay .block-image__paragraph:before {
             display: none !important;
@@ -604,6 +573,36 @@ if (modsConfig.moderniseTextOnImage) {
                 font-family: ${modsConfig.textOnImage_HeadlineFontFamily} !important;
             }`;
     }
+}
+
+if (modsConfig.overrideCoverPagePadding) {
+    finalCustomCSS += `
+        @media(min-width: 62em) {
+            .organic .cover--layout-split-left .cover__header-content,
+            .organic .cover--layout-split-left-image .cover__header-content {
+                padding-block: ${modsConfig.coverPagePadding} !important;
+            }
+        }`;
+}
+
+if (modsConfig.enableTextReader) {
+    finalCustomCSS += `
+        .tts-toggle-button {
+            position: fixed; bottom: 1.2rem; right: 2.6rem;
+            width: ${modsConfig.textReader_ButtonSize}; height: ${modsConfig.textReader_ButtonSize};
+            background-color: #fff; border: 2px solid ${modsConfig.textReader_ButtonColourInactive};
+            border-radius: 50%; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000; transition: border-color 0.3s ease;
+        }
+        .tts-toggle-button.active { border-color: ${modsConfig.textReader_ButtonColour}; border-width: 4px; }
+        .tts-toggle-button svg { transition: fill 0.3s ease; padding: 22%; }
+        body.tts-active-mode .block-wrapper { cursor: pointer; transition: outline 0.2s ease-out; }
+        body.tts-active-mode .block-wrapper:hover {
+            outline: 2px solid ${modsConfig.textReader_ButtonColour};
+            outline-offset: 4px;
+        }
+    `;
 }
 
 if (finalCustomCSS) {
@@ -618,4 +617,4 @@ const config = { childList: true, subtree: true };
 const observer = new MutationObserver(runAllMods);
 observer.observe(targetNode, config);
 window.addEventListener('load', runAllMods);
-console.log('Fire Mods by Discover eLearning: Script loaded and now observing for all content changes...');
+console.log('Fire Mods v0.3 by Discover eLearning: Script loaded and now observing for all content changes...');
