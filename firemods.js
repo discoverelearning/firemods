@@ -158,7 +158,7 @@ function fireConfetti() {
     if (!confettiScriptLoaded) return;
     const { particleCount, spread, startVelocity, colours, origin, zIndex } = modsConfig.confettiSettings;
     let originPoint = { y: 0.7, x: (origin === 'left' ? 0 : origin === 'right' ? 1 : 0.5) };
-    const confettiExecutor = typeof tsParticles !== 'undefined' ? tsParticles.confetti : window.confetti;
+    const confettiExecutor = typeof tsParticles !== 'undefined' ? confetti : window.confetti;
     if (confettiExecutor) {
         confettiExecutor({ particleCount, spread, startVelocity, colors: colours, origin: originPoint, zIndex: zIndex });
     }
