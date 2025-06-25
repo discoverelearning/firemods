@@ -13,7 +13,7 @@ This open source script allows you to inject enhanced features directly into you
 3. Just before the closing `</html>` tag, insert the following line:
 
     ```html
-    <script src="lib/firemods.js"></script>
+    <script type="text/javascript" src="lib/firemods.js"></script>
     ```
 
 4. Save the changes. That’s it!
