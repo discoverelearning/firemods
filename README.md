@@ -85,8 +85,6 @@ Display learners' previously saved reflection responses anywhere in your course 
 
 ### ✏️ Note Taker and Highlighter
 
-Transform your Rise course into an interactive study tool with the Note Taker and Highlighter feature:
-
 - **Text Highlighting**: Learners can select any text in the course and highlight it in multiple colours.
 - **Personal Notes**: Add private notes to any highlighted text or selected content.
 - **Persistent Storage**: All highlights and notes are automatically saved to the learner's browser local storage.
@@ -95,14 +93,11 @@ Transform your Rise course into an interactive study tool with the Note Taker an
   - Add or edit notes attached to text selections
   - Remove existing highlights
 - **Note Indicators**: Visual note icons appear next to text that has attached notes, allowing easy access to view and edit.
-- **Cross-Session Persistence**: Highlights and notes remain available when learners return to the course.
 
 **Customisation Options:**
 - Configure highlight colours with custom names and hex values
 - Customise the note modal title
 - All styling integrates seamlessly with Rise's existing design
-
-This feature is perfect for study courses, reference materials, and any content where learners benefit from personal annotation capabilities.
 
 ### 📖 Menu Customisations
 
