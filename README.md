@@ -83,6 +83,27 @@ Display learners' previously saved reflection responses anywhere in your course 
 - Fully customisable button styling including colours, size, and positioning.
 - Automatically uses the browser's built-in speech synthesis for accessibility.
 
+### ✏️ Note Taker and Highlighter
+
+Transform your Rise course into an interactive study tool with the Note Taker and Highlighter feature:
+
+- **Text Highlighting**: Learners can select any text in the course and highlight it in multiple colours.
+- **Personal Notes**: Add private notes to any highlighted text or selected content.
+- **Persistent Storage**: All highlights and notes are automatically saved to the learner's browser local storage.
+- **Context Menu**: Right-click or use the context menu on selected text to:
+  - Apply highlights in customisable colours (Yellow, Pink, Blue by default)
+  - Add or edit notes attached to text selections
+  - Remove existing highlights
+- **Note Indicators**: Visual note icons appear next to text that has attached notes, allowing easy access to view and edit.
+- **Cross-Session Persistence**: Highlights and notes remain available when learners return to the course.
+
+**Customisation Options:**
+- Configure highlight colours with custom names and hex values
+- Customise the note modal title
+- All styling integrates seamlessly with Rise's existing design
+
+This feature is perfect for study courses, reference materials, and any content where learners benefit from personal annotation capabilities.
+
 ### 📖 Menu Customisations
 
 - **Start with menu hidden**: Automatically collapses the sidebar menu on course load.
@@ -144,4 +165,4 @@ You are welcome to submit issues or pull requests via GitHub if you'd like to co
 
 ## 👋 Created by
 
-[Discover eLearning Ltd](https://discoverelearning.com)  
+[Discover eLearning Ltd](https://discoverelearning.com)
