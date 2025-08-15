@@ -137,6 +137,7 @@ let firemods_loadedHighlightsForPage = [];
 let firemods_noteTakerInitialized = false;
 let firemods_highlighterContextMenu = null;
 let firemods_noteModal = null;
+let firemods_modalOverlay = null; // [NEW] Variable for the mobile overlay
 let firemods_currentRange = null;
 let firemods_activeHighlightIdForNoteModal = null;
 
@@ -145,6 +146,11 @@ let firemods_isDragging = false;
 let firemods_dragStartX = 0;
 let firemods_dragStartY = 0;
 const FIREMODS_DRAG_THRESHOLD = 5;
+
+// [NEW] Helper function to detect mobile devices
+function firemods_isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 function firemods_generateUUID() {
     return 'fm-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -178,21 +184,14 @@ function firemods_saveAllStoredHighlights(allData) {
 function firemods_getNodePath(rootElement, targetNode) {
     const path = [];
     let currentNode = targetNode;
-
-    if (!rootElement || !targetNode) {
-        return null;
-    }
-
+    if (!rootElement || !targetNode) return null;
     if (!rootElement.contains(targetNode)) {
         console.warn(`FireMods (Highlighter): getNodePath: rootElement does NOT contain targetNode. Path generation failed.`);
         return null;
     }
-
     while (currentNode && currentNode !== rootElement) {
         const parent = currentNode.parentNode;
-        if (!parent) {
-            return null;
-        }
+        if (!parent) return null;
         let sibling = currentNode;
         let index = 0;
         while (sibling.previousSibling) {
@@ -202,18 +201,12 @@ function firemods_getNodePath(rootElement, targetNode) {
         path.unshift(index);
         currentNode = parent;
     }
-
-    if (currentNode === rootElement) {
-        return path;
-    }
-    return null;
+    return (currentNode === rootElement) ? path : null;
 }
 
 function firemods_getNodeByPath(rootElement, path) {
     let currentNode = rootElement;
-    if (!rootElement || !path) {
-        return null;
-    }
+    if (!rootElement || !path) return null;
     for (let i = 0; i < path.length; i++) {
         const index = path[i];
         if (currentNode && currentNode.childNodes && currentNode.childNodes[index] !== undefined) {
@@ -227,74 +220,51 @@ function firemods_getNodeByPath(rootElement, path) {
 
 
 function firemods_getRangeSerializationData(range, id, color, type, noteText = null) {
-    if (!range || range.collapsed || (range.startContainer === range.endContainer && range.startOffset === range.endOffset)) {
-        return null;
-    }
-
+    if (!range || range.collapsed || (range.startContainer === range.endContainer && range.startOffset === range.endOffset)) return null;
     const commonAncestor = range.commonAncestorContainer;
     const blockElement = commonAncestor.nodeType === Node.ELEMENT_NODE ?
                          commonAncestor.closest('[data-block-id]') :
                          (commonAncestor.parentNode ? commonAncestor.parentNode.closest('[data-block-id]') : null);
-
     if (!blockElement) {
         console.warn("FireMods (Highlighter): getRangeSerializationData: Could not find parent block with [data-block-id].");
         return null;
     }
     const blockId = blockElement.dataset.blockId;
-
     let contentRoot = null;
     let contentSelector = '';
     let contentRootIndex = 0;
-
-    const stableSelectors = [
-        '.fr-view.rise-tiptap', '.fr-view', '.block-text__paragraph',
-        '.block-text__heading', '.list-item__content', '.block-quote__text'
-    ];
-
+    const stableSelectors = ['.fr-view.rise-tiptap', '.fr-view', '.block-text__paragraph', '.block-text__heading', '.list-item__content', '.block-quote__text'];
     let searchStartNode = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentNode : range.startContainer;
-    
     for (const selector of stableSelectors) {
-        if (!searchStartNode || typeof searchStartNode.closest !== 'function') { 
-            continue;
-        }
+        if (!searchStartNode || typeof searchStartNode.closest !== 'function') continue;
         const closestStableAncestor = searchStartNode.closest(selector);
-        if (closestStableAncestor && blockElement.contains(closestStableAncestor) && 
-            closestStableAncestor.contains(range.startContainer) && 
-            closestStableAncestor.contains(range.endContainer)) {
+        if (closestStableAncestor && blockElement.contains(closestStableAncestor) && closestStableAncestor.contains(range.startContainer) && closestStableAncestor.contains(range.endContainer)) {
             contentRoot = closestStableAncestor;
-            contentSelector = selector; 
+            contentSelector = selector;
             const allMatchingRoots = Array.from(blockElement.querySelectorAll(contentSelector));
             contentRootIndex = allMatchingRoots.indexOf(contentRoot);
-            if (contentRootIndex === -1) { 
+            if (contentRootIndex === -1) {
                 console.error("FireMods (Highlighter): getRangeSerializationData: CRITICAL - Found contentRoot not in querySelectorAll list.");
-                contentRoot = blockElement; 
+                contentRoot = blockElement;
                 contentSelector = '';
                 contentRootIndex = 0;
-                break; 
             }
-            break; 
+            break;
         }
     }
-
     if (!contentRoot) {
         contentRoot = blockElement;
         contentSelector = '';
-        contentRootIndex = 0; 
+        contentRootIndex = 0;
         if (!blockElement.contains(range.startContainer) || !blockElement.contains(range.endContainer)) {
             console.error("FireMods (Highlighter): getRangeSerializationData: Critical - Range containers not within blockElement fallback.");
             return null;
         }
     }
-    
     const startContainerPath = firemods_getNodePath(contentRoot, range.startContainer);
     const endContainerPath = firemods_getNodePath(contentRoot, range.endContainer);
-
-    if (!startContainerPath || !endContainerPath) {
-        return null;
-    }
-    
+    if (!startContainerPath || !endContainerPath) return null;
     const selectedText = (typeof range.toString === 'function' ? range.toString() : "").trim();
-
     return {
         id: id, blockId: blockId, contentSelector: contentSelector, contentRootIndex: contentRootIndex,
         startContainerPath: startContainerPath, startOffset: range.startOffset,
@@ -441,7 +411,7 @@ function firemods_applyHighlight(colorOrNull, isNoteAnchorOnly) {
         activeRangeForDomOps.insertNode(newSpan);
     } catch (e) {
         console.error("FireMods (Highlighter): applyHighlight: Error inserting new span node.", e);
-        if (newSpan.firstChild) { // Fallback insertion
+        if (newSpan.firstChild) {
             let insertionPoint = serializationDetails.commonAncestorContainer;
             if (insertionPoint.nodeType === Node.TEXT_NODE) insertionPoint = insertionPoint.parentNode;
             if (insertionPoint && typeof insertionPoint.appendChild === 'function') insertionPoint.appendChild(newSpan.firstChild);
@@ -520,8 +490,15 @@ function firemods_createNoteModal() {
         <div class="firemods-note-modal-content"><textarea placeholder="Type your note here..."></textarea></div>
         <div class="firemods-note-modal-footer"><button class="firemods-note-modal-save">Save & Close</button></div>`;
     document.body.appendChild(firemods_noteModal);
+    // [NEW] Create the overlay element but don't show it yet
+    firemods_modalOverlay = document.createElement('div');
+    firemods_modalOverlay.className = 'firemods-modal-overlay';
+    firemods_modalOverlay.style.display = 'none';
+    document.body.appendChild(firemods_modalOverlay);
+
     firemods_noteModal.querySelector('.firemods-note-modal-close').addEventListener('click', firemods_hideNoteModal);
     firemods_noteModal.querySelector('.firemods-note-modal-save').addEventListener('click', firemods_saveNoteFromModal);
+    firemods_modalOverlay.addEventListener('click', firemods_hideNoteModal); // Close on overlay click
 }
 
 function firemods_showNoteModal(highlightId, targetElement) {
@@ -530,17 +507,31 @@ function firemods_showNoteModal(highlightId, targetElement) {
     const textarea = firemods_noteModal.querySelector('textarea');
     const highlightData = firemods_loadedHighlightsForPage.find(h => h.id === highlightId);
     textarea.value = highlightData && highlightData.note ? highlightData.note : '';
-    const rect = targetElement.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    firemods_noteModal.style.top = `${rect.bottom + scrollTop + 5}px`;
-    firemods_noteModal.style.left = `${rect.left + scrollLeft}px`;
+    
+    // [MODIFIED] Logic to handle mobile vs. desktop positioning
+    if (firemods_isMobileDevice()) {
+        firemods_noteModal.classList.add('firemods-note-modal--mobile-centered');
+        firemods_noteModal.style.top = '';
+        firemods_noteModal.style.left = '';
+        if(firemods_modalOverlay) firemods_modalOverlay.style.display = 'block';
+    } else {
+        firemods_noteModal.classList.remove('firemods-note-modal--mobile-centered');
+        const rect = targetElement.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        firemods_noteModal.style.top = `${rect.bottom + scrollTop + 5}px`;
+        firemods_noteModal.style.left = `${rect.left + scrollLeft}px`;
+        if(firemods_modalOverlay) firemods_modalOverlay.style.display = 'none';
+    }
+    
     firemods_noteModal.style.display = 'block';
     textarea.focus();
 }
 
 function firemods_hideNoteModal() {
     if (firemods_noteModal) firemods_noteModal.style.display = 'none';
+    // [MODIFIED] Also hide the overlay
+    if (firemods_modalOverlay) firemods_modalOverlay.style.display = 'none';
     firemods_activeHighlightIdForNoteModal = null;
 }
 
@@ -674,7 +665,6 @@ function firemods_recreateHighlightFromData(highlightData) {
         range.setStart(startContainer, highlightData.startOffset);
         range.setEnd(endContainer, highlightData.endOffset);
         if (range.collapsed) {
-            // console.warn("FireMods (Highlighter): recreateHighlightFromData: Reconstructed range is collapsed.", highlightData.id); // Less critical
             return false;
         }
         if (document.querySelector(`[data-highlight-id="${highlightData.id}"]`)) return true; 
@@ -731,7 +721,7 @@ function firemods_loadAndApplyPersistedHighlights() {
 
 function firemods_handleTextSelectionEvent(event) {
     if (!modsConfig.enableNoteTakerAndHighlighter) return;
-    if (event.target.closest('.firemods-highlighter-context-menu, .firemods-note-modal')) {
+    if (event.target.closest('.firemods-highlighter-context-menu, .firemods-note-modal, .firemods-modal-overlay')) {
         firemods_isMouseDown = false; firemods_isDragging = false; return;
     }
     if (firemods_highlighterContextMenu && firemods_highlighterContextMenu.style.display === 'flex' && !firemods_highlighterContextMenu.contains(event.target)) {
@@ -867,7 +857,7 @@ function updateShortcodeDisplay(reflectionId) {
     if (!modsConfig.enableSummaryShortcodes) return;
     const storageKey = `reflection-${reflectionId}`;
     const savedData = localStorage.getItem(storageKey);
-    const replacementText = savedData ? escapeHtml(atob(savedData)) : modsConfig.summaryShortcode_DefaultText;
+    const replacementText = savedData ? escapeHtml(decodeURIComponent(atob(savedData))) : modsConfig.summaryShortcode_DefaultText;
     const targetSpans = document.querySelectorAll(`.summary-shortcode-text[data-shortcode-id="${reflectionId}"]`);
     targetSpans.forEach(span => { span.innerHTML = replacementText.replace(/\n/g, '<br>'); });
 }
@@ -882,7 +872,7 @@ function runShortcodeReplacement() {
             area.innerHTML = area.innerHTML.replace(shortcodeRegex, (match, shortcodeId) => {
                 const storageKey = `reflection-${shortcodeId}`;
                 const savedData = localStorage.getItem(storageKey);
-                const replacementText = savedData ? escapeHtml(atob(savedData)) : modsConfig.summaryShortcode_DefaultText;
+                const replacementText = savedData ? escapeHtml(decodeURIComponent(atob(savedData))) : modsConfig.summaryShortcode_DefaultText;
                 return `<span class="summary-shortcode-text" data-shortcode-id="${shortcodeId}">${replacementText.replace(/\n/g, '<br>')}</span>`;
             });
         }
@@ -1017,11 +1007,24 @@ function runAllMods() {
                     const saveButton = container.querySelector('.reflection-save-btn');
                     const feedback = container.querySelector('.reflection-saved-feedback');
                     const savedAnswer = localStorage.getItem(storageKey);
-                    if (savedAnswer) textarea.value = atob(savedAnswer);
+                    if (savedAnswer) {
+                        try {
+                            textarea.value = decodeURIComponent(atob(savedAnswer));
+                        } catch (e) {
+                            console.error("Fire Mods (Reflection): Could not decode saved answer.", e);
+                            textarea.value = "Error: Could not load saved answer.";
+                        }
+                    }
                     saveButton.addEventListener('click', () => {
-                        localStorage.setItem(storageKey, btoa(textarea.value));
-                        feedback.classList.add('visible'); updateShortcodeDisplay(reflectionId);
-                        setTimeout(() => feedback.classList.remove('visible'), 2000);
+                        try {
+                            localStorage.setItem(storageKey, btoa(encodeURIComponent(textarea.value)));
+                            feedback.classList.add('visible'); 
+                            updateShortcodeDisplay(reflectionId);
+                            setTimeout(() => feedback.classList.remove('visible'), 2000);
+                        } catch (e) {
+                            console.error("Fire Mods (Reflection): Could not save answer due to encoding error.", e);
+                            alert("Error: Could not save your answer. Please ensure your text does not contain unsupported characters and try again.");
+                        }
                     });
                 }
             }
@@ -1115,7 +1118,13 @@ if (modsConfig.enableSummaryShortcodes) finalCustomCSS += `.summary-shortcode-te
 if (modsConfig.moderniseTextOnImage) { let glassEffectCSS = modsConfig.textOnImage_GlassEffect ? `background: ${modsConfig.textOnImage_GlassBackground} !important; backdrop-filter: blur(${modsConfig.textOnImage_GlassBlur}) !important; -webkit-backdrop-filter: blur(${modsConfig.textOnImage_GlassBlur}) !important; border: 1px solid rgba(255, 255, 255, 0.18);` : ''; let dropShadowCSS = modsConfig.textOnImage_DropShadow ? `box-shadow: ${modsConfig.textOnImage_Shadow} !important;` : ''; finalCustomCSS += `.block-image--overlay .block-image__paragraph { ${glassEffectCSS} ${dropShadowCSS} padding: ${modsConfig.textOnImage_Padding} !important; border-radius: 8px; } @media(min-width: 48em) { .block-image--overlay .block-image__col { width: ${modsConfig.textOnImage_TextBlockWidth} !important; } } .block-image--overlay .block-image__paragraph:before { display: none !important; }`; if (modsConfig.textOnImage_CustomHeadlineFont) finalCustomCSS += `.block-image__paragraph.brand--linkColor p:first-of-type { font-family: ${modsConfig.textOnImage_HeadlineFontFamily} !important; }`;}
 if (modsConfig.overrideCoverPagePadding) finalCustomCSS += `@media(min-width: 62em) { .organic .cover--layout-split-left .cover__header-content, .organic .cover--layout-split-left-image .cover__header-content { padding-block: ${modsConfig.coverPagePadding} !important; } }`;
 if (modsConfig.enableTextReader) finalCustomCSS += `.tts-toggle-button { position: fixed; bottom: 1.2rem; right: 2.6rem; width: ${modsConfig.textReader_ButtonSize}; height: ${modsConfig.textReader_ButtonSize}; background-color: #fff; border: 2px solid ${modsConfig.textReader_ButtonColourInactive}; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; transition: border-color 0.3s ease, border-width 0.3s ease; } .tts-toggle-button.active { border-color: ${modsConfig.textReader_ButtonColour}; border-width: 4px; } .tts-toggle-button svg { width: 60%; height: 60%; transition: fill 0.3s ease; } body.tts-active-mode .block-wrapper { cursor: pointer; transition: outline 0.2s ease-out; } body.tts-active-mode .block-wrapper:hover { outline: 2px solid ${modsConfig.textReader_ButtonColour}; outline-offset: 4px; }`;
-if (modsConfig.enableNoteTakerAndHighlighter) finalCustomCSS += `.firemods-highlight { padding: 0.1em 0; margin: 0; border-radius: 3px; } .firemods-note-anchor { display: inline; padding: 0; margin: 0; } .firemods-note-indicator { display: inline-block; vertical-align: super; font-size: 0.7em; margin-left: 2px; cursor: pointer; user-select: none; } .firemods-note-indicator svg { display: inline-block; vertical-align: middle; } .firemods-highlighter-context-menu { position: absolute; z-index: 10001; background-color: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); padding: 5px; display: flex; gap: 5px; } .firemods-highlighter-context-menu button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; background-color: #f0f0f0; } .firemods-highlighter-context-menu button:hover { border-color: #bbb; opacity: 0.8; } .firemods-highlighter-context-menu button svg { width: 18px; height: 18px; } .firemods-note-modal { position: absolute; z-index: 10002; width: 300px; background-color: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); display: flex; flex-direction: column; } .firemods-note-modal-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; } .firemods-note-modal-header h3 { margin: 0; font-size: 1.2em; } .firemods-note-modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0 5px; line-height: 1; } .firemods-note-modal-content { padding: 15px; } .firemods-note-modal-content textarea { width: 100%; min-height: 100px; border: 1px solid #ddd; border-radius: 4px; padding: 8px; font-size: 1em; resize: vertical; box-sizing: border-box; } .firemods-note-modal-footer { padding: 10px 15px; border-top: 1px solid #eee; text-align: right; } .firemods-note-modal-save { padding: 8px 15px; background-color: var(--color-theme, #0070a3); color: #fff; border: none; border-radius: 4px; cursor: pointer; } .firemods-note-modal-save:hover { opacity: 0.9; }`;
+if (modsConfig.enableNoteTakerAndHighlighter) finalCustomCSS += `
+    .firemods-highlight { padding: 0.1em 0; margin: 0; border-radius: 3px; } .firemods-note-anchor { display: inline; padding: 0; margin: 0; } .firemods-note-indicator { display: inline-block; vertical-align: super; font-size: 0.7em; margin-left: 2px; cursor: pointer; user-select: none; } .firemods-note-indicator svg { display: inline-block; vertical-align: middle; } .firemods-highlighter-context-menu { position: absolute; z-index: 10001; background-color: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); padding: 5px; display: flex; gap: 5px; } .firemods-highlighter-context-menu button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; background-color: #f0f0f0; } .firemods-highlighter-context-menu button:hover { border-color: #bbb; opacity: 0.8; } .firemods-highlighter-context-menu button svg { width: 18px; height: 18px; } .firemods-note-modal { position: absolute; z-index: 10002; width: 300px; background-color: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); display: flex; flex-direction: column; } .firemods-note-modal-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; } .firemods-note-modal-header h3 { margin: 0; font-size: 1.2em; } .firemods-note-modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0 5px; line-height: 1; } .firemods-note-modal-content { padding: 15px; } .firemods-note-modal-content textarea { width: 100%; min-height: 100px; border: 1px solid #ddd; border-radius: 4px; padding: 8px; font-size: 1em; resize: vertical; box-sizing: border-box; } .firemods-note-modal-footer { padding: 10px 15px; border-top: 1px solid #eee; text-align: right; } .firemods-note-modal-save { padding: 8px 15px; background-color: var(--color-theme, #0070a3); color: #fff; border: none; border-radius: 4px; cursor: pointer; } .firemods-note-modal-save:hover { opacity: 0.9; }
+    /* [NEW] Styles for mobile modal positioning and overlay */
+    .firemods-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 10001; }
+    .firemods-note-modal--mobile-centered { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90vw; max-height: 80vh; width: 400px; }
+    .firemods-note-modal--mobile-centered .firemods-note-modal-content { overflow-y: auto; }
+`;
 
 if (finalCustomCSS) {
     let styleElement = document.getElementById('firemods-custom-styles');
@@ -1136,4 +1145,4 @@ window.addEventListener('popstate', () => {
     }
     runAllMods(); 
 });
-console.log('Fire Mods v0.4 by Discover eLearning: Script loaded and now observing for all content changes...');
+console.log('Fire Mods v0.5 by Discover eLearning: Script loaded and now observing for all content changes...');

@@ -12,7 +12,7 @@ This open source script allows you to inject enhanced features directly into you
 2. Open the `index.html` file located in the **root** directory of your project.
 3. Just before the closing `</html>` tag, insert the following line:
 
-    ```html
+    ```html 
     <script type="text/javascript" src="lib/firemods.js"></script>
     ```
 
