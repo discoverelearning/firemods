@@ -71,6 +71,7 @@ const modsConfig = {
 
     // --- Rise Background Customisations (Apply fixed background behind all standard Rise content blocks, this does not apply for example to TEXT ON IMAGE blocks) ---
     enableCustomBackground: false,
+	overrideLightStyleOnly: false,							  
     backgroundColour: '#fdfdfd',
     showGridLines: false,
     gridLineColour: 'rgba(0, 0, 0, 0.04)',
@@ -967,9 +968,17 @@ function runAllMods() {
     }
 
     if (modsConfig.enableCustomBackground) {
-        document.querySelectorAll('.block-wrapper:not([data-modded="true"])').forEach(block => {
-            block.style.backgroundColor = 'transparent'; block.style.boxShadow = 'none';
-            block.style.setProperty('--color-background', 'transparent'); block.dataset.modded = 'true';
+        let selector;
+        if (modsConfig.overrideLightStyleOnly) {
+            selector = '.block-wrapper.bg--type-light:not([data-modded="true"])';
+        } else {
+            selector = '.block-wrapper:not([data-modded="true"])';
+        }
+        document.querySelectorAll(selector).forEach(block => {
+            block.style.backgroundColor = 'transparent';
+            block.style.boxShadow = 'none';
+            block.style.setProperty('--color-background', 'transparent');
+            block.dataset.modded = 'true';
         });
     }
     if (modsConfig.startWithMenuHidden && !menuToggleButtonClicked) {
@@ -1145,4 +1154,4 @@ window.addEventListener('popstate', () => {
     }
     runAllMods(); 
 });
-console.log('Fire Mods v0.5 by Discover eLearning: Script loaded and now observing for all content changes...');
+console.log('Fire Mods v0.6 by Discover eLearning: Script loaded and now observing for all content changes...');

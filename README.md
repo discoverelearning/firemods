@@ -69,6 +69,7 @@ Display learners' previously saved reflection responses anywhere in your course 
 ### 🖼️ Custom Background Styling
 
 - Apply a **fixed background colour** behind standard Rise content blocks.
+- Option to override all background colour styles or 'Light' style only.
 - **Option to enable a custom image file as a custom background style** for enhanced visual appeal.
 - Optionally overlay **grid lines**, with adjustable colour and spacing.
 - Does not affect the behaviour of Text On Image blocks.
