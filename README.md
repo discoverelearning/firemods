@@ -12,7 +12,7 @@ This open source script allows you to inject enhanced features directly into you
 2. Open the `index.html` file located in the **root** directory of your project.
 3. Just before the closing `</html>` tag, insert the following line:
 
-    ```html 
+    ```html
     <script type="text/javascript" src="lib/firemods.js"></script>
     ```
 
@@ -69,7 +69,6 @@ Display learners' previously saved reflection responses anywhere in your course 
 ### 🖼️ Custom Background Styling
 
 - Apply a **fixed background colour** behind standard Rise content blocks.
-- Option to override all background colour styles or 'Light' style only.
 - **Option to enable a custom image file as a custom background style** for enhanced visual appeal.
 - Optionally overlay **grid lines**, with adjustable colour and spacing.
 - Does not affect the behaviour of Text On Image blocks.
@@ -86,6 +85,8 @@ Display learners' previously saved reflection responses anywhere in your course 
 
 ### ✏️ Note Taker and Highlighter
 
+Transform your Rise course into an interactive study tool with the Note Taker and Highlighter feature:
+
 - **Text Highlighting**: Learners can select any text in the course and highlight it in multiple colours.
 - **Personal Notes**: Add private notes to any highlighted text or selected content.
 - **Persistent Storage**: All highlights and notes are automatically saved to the learner's browser local storage.
@@ -94,11 +95,14 @@ Display learners' previously saved reflection responses anywhere in your course 
   - Add or edit notes attached to text selections
   - Remove existing highlights
 - **Note Indicators**: Visual note icons appear next to text that has attached notes, allowing easy access to view and edit.
+- **Cross-Session Persistence**: Highlights and notes remain available when learners return to the course.
 
 **Customisation Options:**
 - Configure highlight colours with custom names and hex values
 - Customise the note modal title
 - All styling integrates seamlessly with Rise's existing design
+
+This feature is perfect for study courses, reference materials, and any content where learners benefit from personal annotation capabilities.
 
 ### 📖 Menu Customisations
 
@@ -109,6 +113,12 @@ Display learners' previously saved reflection responses anywhere in your course 
 
 - **Centre align button blocks**: Removes text description spacing and centres buttons within the block.
 - Adjustable **button height** for consistency across devices.
+
+### ✨ Button Hover Effects
+
+- **Motion effects**: Choose 'grow', 'shake', or 'none' for button hover animations.
+- **Custom hover colors**: Set background and font colors for button hover states.
+- Applies to all button types with smooth transitions.
 
 ### ➡️ Continue Button Tweaks
 

@@ -97,6 +97,12 @@ const modsConfig = {
     centreAlignButtons: false, //Change true To Activate. Remove all text from the button block in Rise
     centredButtonHeight: '5rem', //Change to add extra height to the button if required
 
+    // --- Button Hover Effects ---
+    activateButtonHoverEffects: true,    // Master switch for all button hover effects
+    buttonHoverEffect: 'grow',            // Choose motion effect: 'grow', 'shake', or 'none'
+    buttonHoverFillColor: '#ffffff',     // Set the background color for buttons on hover (e.g., '#ffffff' for white, 'transparent' for transparent, '#ff0000' for red)
+    buttonHoverFillFontColor: '#000', // Font color change, ONLY active if buttonHoverFillColor is set
+
     // --- Continue Button Block Customisations---
     roundContinueButtons: false, 
     continueButton_BorderRadius: '50px',
@@ -138,7 +144,7 @@ let firemods_loadedHighlightsForPage = [];
 let firemods_noteTakerInitialized = false;
 let firemods_highlighterContextMenu = null;
 let firemods_noteModal = null;
-let firemods_modalOverlay = null; // [NEW] Variable for the mobile overlay
+let firemods_modalOverlay = null;
 let firemods_currentRange = null;
 let firemods_activeHighlightIdForNoteModal = null;
 
@@ -148,7 +154,6 @@ let firemods_dragStartX = 0;
 let firemods_dragStartY = 0;
 const FIREMODS_DRAG_THRESHOLD = 5;
 
-// [NEW] Helper function to detect mobile devices
 function firemods_isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
@@ -491,7 +496,6 @@ function firemods_createNoteModal() {
         <div class="firemods-note-modal-content"><textarea placeholder="Type your note here..."></textarea></div>
         <div class="firemods-note-modal-footer"><button class="firemods-note-modal-save">Save & Close</button></div>`;
     document.body.appendChild(firemods_noteModal);
-    // [NEW] Create the overlay element but don't show it yet
     firemods_modalOverlay = document.createElement('div');
     firemods_modalOverlay.className = 'firemods-modal-overlay';
     firemods_modalOverlay.style.display = 'none';
@@ -499,7 +503,7 @@ function firemods_createNoteModal() {
 
     firemods_noteModal.querySelector('.firemods-note-modal-close').addEventListener('click', firemods_hideNoteModal);
     firemods_noteModal.querySelector('.firemods-note-modal-save').addEventListener('click', firemods_saveNoteFromModal);
-    firemods_modalOverlay.addEventListener('click', firemods_hideNoteModal); // Close on overlay click
+    firemods_modalOverlay.addEventListener('click', firemods_hideNoteModal);
 }
 
 function firemods_showNoteModal(highlightId, targetElement) {
@@ -509,7 +513,6 @@ function firemods_showNoteModal(highlightId, targetElement) {
     const highlightData = firemods_loadedHighlightsForPage.find(h => h.id === highlightId);
     textarea.value = highlightData && highlightData.note ? highlightData.note : '';
     
-    // [MODIFIED] Logic to handle mobile vs. desktop positioning
     if (firemods_isMobileDevice()) {
         firemods_noteModal.classList.add('firemods-note-modal--mobile-centered');
         firemods_noteModal.style.top = '';
@@ -531,7 +534,6 @@ function firemods_showNoteModal(highlightId, targetElement) {
 
 function firemods_hideNoteModal() {
     if (firemods_noteModal) firemods_noteModal.style.display = 'none';
-    // [MODIFIED] Also hide the overlay
     if (firemods_modalOverlay) firemods_modalOverlay.style.display = 'none';
     firemods_activeHighlightIdForNoteModal = null;
 }
@@ -665,9 +667,7 @@ function firemods_recreateHighlightFromData(highlightData) {
         const range = document.createRange();
         range.setStart(startContainer, highlightData.startOffset);
         range.setEnd(endContainer, highlightData.endOffset);
-        if (range.collapsed) {
-            return false;
-        }
+        if (range.collapsed) return false;
         if (document.querySelector(`[data-highlight-id="${highlightData.id}"]`)) return true; 
         const newSpan = document.createElement('span');
         newSpan.dataset.highlightId = highlightData.id;
@@ -1116,24 +1116,47 @@ if (modsConfig.enableCustomBackground) {
     bgLayers.reverse(); bgSizes.reverse(); bgPositions.reverse(); bgRepeats.reverse();
     let pageWrapCSS = `background-color: ${modsConfig.backgroundColour}; background-attachment: fixed;`;
     if (bgLayers.length > 0) pageWrapCSS += `background-image: ${bgLayers.join(', ')}; background-size: ${bgSizes.join(', ')}; background-position: ${bgPositions.join(', ')}; background-repeat: ${bgRepeats.join(', ')};`;
-    finalCustomCSS += `#page-wrap { ${pageWrapCSS} } .page__wrapper--white, .page__header, .blocks-lesson, .lesson-nav--full { background: transparent !important; }`;
+    let selector = modsConfig.overrideLightStyleOnly ? '.page.bg--type-light' : '#page-wrap';
+    finalCustomCSS += `${selector} { ${pageWrapCSS} } .page__wrapper--white, .page__header, .blocks-lesson, .lesson-nav--full { background: transparent !important; }`;
 }
 if (modsConfig.centreAlignButtons) finalCustomCSS += `.blocks-button__description { display: none !important; } .blocks-button__container { max-width: none !important; justify-content: center !important; } .blocks-button__button { flex: 0 1 auto !important; max-width: 30rem !important; min-width: 15rem !important; height: ${modsConfig.centredButtonHeight} !important; line-height: ${modsConfig.centredButtonHeight} !important; }`;
 if (modsConfig.moderniseMenuButton) finalCustomCSS += `.nav-control__button { background: rgba(255, 255, 255, ${modsConfig.modernMenuButton_Opacity}) !important; backdrop-filter: blur(${modsConfig.modernMenuButton_Blur}) !important; -webkit-backdrop-filter: blur(${modsConfig.modernMenuButton_Blur}) !important; box-shadow: ${modsConfig.modernMenuButton_Shadow} !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 8px !important; transition: transform 0.2s ease-in-out !important; } .nav-control__button:hover { transform: scale(${modsConfig.modernMenuButton_HoverScale}) !important; } .nav-control__button svg { will-change: transform; transform: translateZ(0); }`;
 if (modsConfig.roundContinueButtons) finalCustomCSS += `.continue-btn { border-radius: ${modsConfig.continueButton_BorderRadius} !important; }`;
 if (modsConfig.replaceContinueWithLine) finalCustomCSS += `.continue-divider-mod { padding: 0 !important; height: 0px !important; margin: 3rem auto !important; border-top: 1px solid ${modsConfig.continueLineColour} !important; width: ${modsConfig.continueLineWidth} !important; }`;
-if (modsConfig.enableReflectionBlocks) finalCustomCSS += `.reflection-block { display: flex; flex-direction: column; width: 100%; gap: 1rem; } .reflection-block--centred { align-items: center; } .reflection-block--centred h3, .reflection-block--centred p { text-align: center; } .reflection-block--centred .reflection-textarea { text-align: center; } .reflection-block h3 { font-size: 2.2rem; font-weight: bold; margin: 0; } .reflection-block p { font-size: 1.6rem; margin: 0; } .reflection-textarea { width: 100%; min-height: 120px; padding: 1rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1.6rem; transition: border-color 0.2s; } .reflection-textarea:focus { border-color: var(--color-theme, #00aff0); outline: none; } .reflection-save-btn { padding: 1rem 2rem; border: none; border-radius: ${modsConfig.reflectionBlock_ButtonRadius}; background-color: var(--color-theme, #00aff0); color: var(--color-theme-contrast, #fff); font-size: 1.6rem; font-weight: bold; cursor: pointer; transition: opacity 0.2s; } .reflection-save-btn:hover { opacity: 0.8; } .reflection-saved-feedback { margin-top: 1rem; color: var(--color-theme, #00aff0); font-weight: bold; opacity: 0; transition: opacity 0.3s; } .reflection-saved-feedback.visible { opacity: 1; }`;
+if (modsConfig.enableReflectionBlocks) finalCustomCSS += `.reflection-block { display: flex; flex-direction: column; width: 100%; gap: 1rem; } .reflection-block--centred { align-items: center; } .reflection-block--centred h3, .reflection-block--centred p { text-align: center; } .reflection-block--centred .reflection-textarea { text-align: center; } .reflection-block h3 { font-size: 2.2rem; font-weight: bold; margin: 0; } .reflection-block p { font-size: 1.6rem; margin: 0; } .reflection-textarea { width: 100%; min-height: 120px; padding: 1rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1.6rem; transition: border-color 0.2s; } .reflection-textarea:focus { border-color: var(--color-theme, #00aff0); outline: none; } .reflection-save-btn { padding: 1rem 2rem; border: 1px solid var(--color-theme, #00aff0); border-radius: ${modsConfig.reflectionBlock_ButtonRadius}; background-color: var(--color-theme, #00aff0); color: var(--color-theme-contrast, #fff); font-size: 1.6rem; font-weight: bold; cursor: pointer; transition: opacity 0.2s; } .reflection-save-btn:hover { opacity: 0.8; } .reflection-saved-feedback { margin-top: 1rem; color: var(--color-theme, #00aff0); font-weight: bold; opacity: 0; transition: opacity 0.3s; } .reflection-saved-feedback.visible { opacity: 1; }`;
 if (modsConfig.enableSummaryShortcodes) finalCustomCSS += `.summary-shortcode-text { font-style: italic; background-color: #f0f0f0; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid #e0e0e0; white-space: pre-wrap; }`;
 if (modsConfig.moderniseTextOnImage) { let glassEffectCSS = modsConfig.textOnImage_GlassEffect ? `background: ${modsConfig.textOnImage_GlassBackground} !important; backdrop-filter: blur(${modsConfig.textOnImage_GlassBlur}) !important; -webkit-backdrop-filter: blur(${modsConfig.textOnImage_GlassBlur}) !important; border: 1px solid rgba(255, 255, 255, 0.18);` : ''; let dropShadowCSS = modsConfig.textOnImage_DropShadow ? `box-shadow: ${modsConfig.textOnImage_Shadow} !important;` : ''; finalCustomCSS += `.block-image--overlay .block-image__paragraph { ${glassEffectCSS} ${dropShadowCSS} padding: ${modsConfig.textOnImage_Padding} !important; border-radius: 8px; } @media(min-width: 48em) { .block-image--overlay .block-image__col { width: ${modsConfig.textOnImage_TextBlockWidth} !important; } } .block-image--overlay .block-image__paragraph:before { display: none !important; }`; if (modsConfig.textOnImage_CustomHeadlineFont) finalCustomCSS += `.block-image__paragraph.brand--linkColor p:first-of-type { font-family: ${modsConfig.textOnImage_HeadlineFontFamily} !important; }`;}
 if (modsConfig.overrideCoverPagePadding) finalCustomCSS += `@media(min-width: 62em) { .organic .cover--layout-split-left .cover__header-content, .organic .cover--layout-split-left-image .cover__header-content { padding-block: ${modsConfig.coverPagePadding} !important; } }`;
 if (modsConfig.enableTextReader) finalCustomCSS += `.tts-toggle-button { position: fixed; bottom: 1.2rem; right: 2.6rem; width: ${modsConfig.textReader_ButtonSize}; height: ${modsConfig.textReader_ButtonSize}; background-color: #fff; border: 2px solid ${modsConfig.textReader_ButtonColourInactive}; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; transition: border-color 0.3s ease, border-width 0.3s ease; } .tts-toggle-button.active { border-color: ${modsConfig.textReader_ButtonColour}; border-width: 4px; } .tts-toggle-button svg { width: 60%; height: 60%; transition: fill 0.3s ease; } body.tts-active-mode .block-wrapper { cursor: pointer; transition: outline 0.2s ease-out; } body.tts-active-mode .block-wrapper:hover { outline: 2px solid ${modsConfig.textReader_ButtonColour}; outline-offset: 4px; }`;
-if (modsConfig.enableNoteTakerAndHighlighter) finalCustomCSS += `
-    .firemods-highlight { padding: 0.1em 0; margin: 0; border-radius: 3px; } .firemods-note-anchor { display: inline; padding: 0; margin: 0; } .firemods-note-indicator { display: inline-block; vertical-align: super; font-size: 0.7em; margin-left: 2px; cursor: pointer; user-select: none; } .firemods-note-indicator svg { display: inline-block; vertical-align: middle; } .firemods-highlighter-context-menu { position: absolute; z-index: 10001; background-color: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); padding: 5px; display: flex; gap: 5px; } .firemods-highlighter-context-menu button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; background-color: #f0f0f0; } .firemods-highlighter-context-menu button:hover { border-color: #bbb; opacity: 0.8; } .firemods-highlighter-context-menu button svg { width: 18px; height: 18px; } .firemods-note-modal { position: absolute; z-index: 10002; width: 300px; background-color: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); display: flex; flex-direction: column; } .firemods-note-modal-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; } .firemods-note-modal-header h3 { margin: 0; font-size: 1.2em; } .firemods-note-modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0 5px; line-height: 1; } .firemods-note-modal-content { padding: 15px; } .firemods-note-modal-content textarea { width: 100%; min-height: 100px; border: 1px solid #ddd; border-radius: 4px; padding: 8px; font-size: 1em; resize: vertical; box-sizing: border-box; } .firemods-note-modal-footer { padding: 10px 15px; border-top: 1px solid #eee; text-align: right; } .firemods-note-modal-save { padding: 8px 15px; background-color: var(--color-theme, #0070a3); color: #fff; border: none; border-radius: 4px; cursor: pointer; } .firemods-note-modal-save:hover { opacity: 0.9; }
-    /* [NEW] Styles for mobile modal positioning and overlay */
-    .firemods-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 10001; }
-    .firemods-note-modal--mobile-centered { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90vw; max-height: 80vh; width: 400px; }
-    .firemods-note-modal--mobile-centered .firemods-note-modal-content { overflow-y: auto; }
-`;
+if (modsConfig.enableNoteTakerAndHighlighter) finalCustomCSS += `.firemods-highlight { padding: 0.1em 0; margin: 0; border-radius: 3px; } .firemods-note-anchor { display: inline; padding: 0; margin: 0; } .firemods-note-indicator { display: inline-block; vertical-align: super; font-size: 0.7em; margin-left: 2px; cursor: pointer; user-select: none; } .firemods-note-indicator svg { display: inline-block; vertical-align: middle; } .firemods-highlighter-context-menu { position: absolute; z-index: 10001; background-color: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); padding: 5px; display: flex; gap: 5px; } .firemods-highlighter-context-menu button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; background-color: #f0f0f0; } .firemods-highlighter-context-menu button:hover { border-color: #bbb; opacity: 0.8; } .firemods-highlighter-context-menu button svg { width: 18px; height: 18px; } .firemods-note-modal { position: absolute; z-index: 10002; width: 300px; background-color: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); display: flex; flex-direction: column; } .firemods-note-modal-header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; } .firemods-note-modal-header h3 { margin: 0; font-size: 1.2em; } .firemods-note-modal-close { background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0 5px; line-height: 1; } .firemods-note-modal-content { padding: 15px; } .firemods-note-modal-content textarea { width: 100%; min-height: 100px; border: 1px solid #ddd; border-radius: 4px; padding: 8px; font-size: 1em; resize: vertical; box-sizing: border-box; } .firemods-note-modal-footer { padding: 10px 15px; border-top: 1px solid #eee; text-align: right; } .firemods-note-modal-save { padding: 8px 15px; background-color: var(--color-theme, #0070a3); color: #fff; border: none; border-radius: 4px; cursor: pointer; } .firemods-note-modal-save:hover { opacity: 0.9; } .firemods-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 10001; } .firemods-note-modal--mobile-centered { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90vw; max-height: 80vh; width: 400px; } .firemods-note-modal--mobile-centered .firemods-note-modal-content { overflow-y: auto; }`;
+if (modsConfig.activateButtonHoverEffects) {
+    const buttonSelector = `a.blocks-button__button, .continue-btn, .blocks-buttonstack__button, .quiz-question-options__submit-button, .quiz-question-choices__item-inner, .quiz-header__actions-button, .reflection-save-btn, .block-process-card__start-btn`;
+    const buttonSelectors = buttonSelector.split(', ');
+    const hoverSelectors = buttonSelectors.map(sel => `${sel.trim()}:hover`).join(', ');
+    
+    finalCustomCSS += `${buttonSelector} { transition: all 0.2s ease-in-out !important; }`;
+    if (modsConfig.buttonHoverEffect === 'grow') {
+        finalCustomCSS += `${hoverSelectors} { transform: scale(1.05) !important; }`;
+    }
+    if (modsConfig.buttonHoverEffect === 'shake') {
+        finalCustomCSS += `@keyframes firemods-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(3px); } 50% { transform: translateX(-3px); } 75% { transform: translateX(3px); } } ${hoverSelectors} { animation: firemods-shake 0.3s ease-in-out !important; }`;
+    }
+    if (modsConfig.buttonHoverFillColor) {
+        const nonHoverSelectors = buttonSelectors.map(sel => `${sel.trim()}:not(:hover)`).join(', ');
+        
+        finalCustomCSS += `
+            ${nonHoverSelectors} {
+                background-color: var(--color-theme, #0070a3) !important;
+            }
+            ${hoverSelectors} {
+                background-color: ${modsConfig.buttonHoverFillColor} !important;
+                border: 1px solid var(--color-theme, #0070a3) !important;
+                color: ${modsConfig.buttonHoverFillFontColor} !important;
+            }
+        `;
+    }
+}
+
 
 if (finalCustomCSS) {
     let styleElement = document.getElementById('firemods-custom-styles');
@@ -1154,4 +1177,4 @@ window.addEventListener('popstate', () => {
     }
     runAllMods(); 
 });
-console.log('Fire Mods v0.6 by Discover eLearning: Script loaded and now observing for all content changes...');
+console.log('Fire Mods v0.7 by Discover eLearning: Script loaded and now observing for all content changes...');
